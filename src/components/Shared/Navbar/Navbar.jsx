@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Link } from "react-router";
 import useAuth from "../../../hooks/useAuth";
 import avatarImg from "../../../assets/images/placeholder.jpg";
-import logo from "../../../assets/images/logo-flat.png";
+
 
 const Navbar = () => {
   const { user, logOut } = useAuth();

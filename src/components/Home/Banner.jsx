@@ -6,7 +6,7 @@ import "swiper/css/navigation";
 
 const Banner = () => {
   return (
-    <div className="w-full h-[400px] md:h-[500px] lg:h-[600px]">
+    <div className="w-full h-[400px] md:h-[500px] lg:h-[400px] rounded-2xl overflow-hidden">
       <Swiper
         spaceBetween={30}
         centeredSlides={true}
@@ -19,7 +19,7 @@ const Banner = () => {
         }}
         // navigation={true}
         modules={[Autoplay, Pagination, Navigation]}
-        className="h-full"
+        className="h-full rounded-2xl"
       >
         {/* Slide 1 */}
         <SwiperSlide>
