@@ -4,9 +4,14 @@ import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
 
+// Image imports
+import reportImg from "../../assets/images/report.jpg";
+import trackImg from "../../assets/images/track.jpg";
+import boostImg from "../../assets/images/boost.jpg";
+
 const Banner = () => {
   return (
-    <div className="w-full h-[400px] md:h-[500px] lg:h-[400px] rounded-2xl overflow-hidden">
+    <div className="w-full h-[350px] md:h-[450px] lg:h-[450px] rounded-2xl overflow-hidden">
       <Swiper
         spaceBetween={30}
         centeredSlides={true}
@@ -17,34 +22,54 @@ const Banner = () => {
         pagination={{
           clickable: true,
         }}
-        // navigation={true}
         modules={[Autoplay, Pagination, Navigation]}
         className="h-full rounded-2xl"
       >
         {/* Slide 1 */}
         <SwiperSlide>
-          <div className="h-full flex items-center justify-center bg-gradient-to-r from-green-400 to-blue-500 text-white">
-            <h1 className="text-3xl md:text-5xl font-bold">
-              Report Issues Easily
-            </h1>
+          <div className="h-full relative">
+            <img
+              src={reportImg}
+              alt="Report Issues"
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+              <h1 className="text-3xl md:text-5xl font-bold text-white">
+                Report Issues Easily
+              </h1>
+            </div>
           </div>
         </SwiperSlide>
 
         {/* Slide 2 */}
         <SwiperSlide>
-          <div className="h-full flex items-center justify-center bg-gradient-to-r from-purple-400 to-pink-500 text-white">
-            <h1 className="text-3xl md:text-5xl font-bold">
-              Track Progress in Real-Time
-            </h1>
+          <div className="h-full relative">
+            <img
+              src={trackImg}
+              alt="Track Progress"
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+              <h1 className="text-3xl md:text-5xl font-bold text-white">
+                Track Progress in Real-Time
+              </h1>
+            </div>
           </div>
         </SwiperSlide>
 
         {/* Slide 3 */}
         <SwiperSlide>
-          <div className="h-full flex items-center justify-center bg-gradient-to-r from-yellow-400 to-red-500 text-white">
-            <h1 className="text-3xl md:text-5xl font-bold">
-              Boost Priority with Subscription
-            </h1>
+          <div className="h-full relative">
+            <img
+              src={boostImg}
+              alt="Boost Priority"
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+              <h1 className="text-3xl md:text-5xl font-bold text-white">
+                Boost Priority with Subscription
+              </h1>
+            </div>
           </div>
         </SwiperSlide>
       </Swiper>
