@@ -9,7 +9,7 @@ import avatarImg from "../../../assets/images/placeholder.jpg";
 const Navbar = () => {
   const { user, logOut } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
-
+// console.log(user.displayName);
   return (
     <div className="fixed w-full bg-white z-10 shadow-sm">
       <div className="py-4 ">
@@ -67,6 +67,12 @@ const Navbar = () => {
                   <div className="flex flex-col cursor-pointer">
                     {user ? (
                       <>
+                        <div
+                          
+                          className="px-4 py-3 hover:bg-neutral-100 transition font-semibold cursor-pointer"
+                        >
+                          {user.displayName}
+                        </div>
                         <Link
                           to="/dashboard"
                           className="px-4 py-3 hover:bg-neutral-100 transition font-semibold"

@@ -1,45 +1,60 @@
-import Home from '../pages/Home/Home'
-import ErrorPage from '../pages/ErrorPage'
-import Login from '../pages/Login/Login'
-import SignUp from '../pages/SignUp/SignUp'
-import PlantDetails from '../pages/PlantDetails/PlantDetails'
-import PrivateRoute from './PrivateRoute'
-import DashboardLayout from '../layouts/DashboardLayout'
-import AddPlant from '../pages/Dashboard/Seller/AddPlant'
-import ManageUsers from '../pages/Dashboard/Admin/ManageUsers'
-import Profile from '../pages/Dashboard/Common/Profile'
-import Statistics from '../pages/Dashboard/Common/Statistics'
-import MainLayout from '../layouts/MainLayout'
-import MyInventory from '../pages/Dashboard/Seller/MyInventory'
-import ManageOrders from '../pages/Dashboard/Seller/ManageOrders'
-import MyOrders from '../pages/Dashboard/Customer/MyOrders'
-import { createBrowserRouter } from 'react-router'
-import AllIssues from '../pages/AllIssues/AllIssues'
+import Home from "../pages/Home/Home";
+import ErrorPage from "../pages/ErrorPage";
+import Login from "../pages/Login/Login";
+import SignUp from "../pages/SignUp/SignUp";
+import PlantDetails from "../pages/PlantDetails/PlantDetails";
+import PrivateRoute from "./PrivateRoute";
+import DashboardLayout from "../layouts/DashboardLayout";
+import AddPlant from "../pages/Dashboard/Seller/AddPlant";
+import ManageUsers from "../pages/Dashboard/Admin/ManageUsers";
+import Profile from "../pages/Dashboard/Common/Profile";
+import Statistics from "../pages/Dashboard/Common/Statistics";
+import MainLayout from "../layouts/MainLayout";
+
+import ManageOrders from "../pages/Dashboard/Seller/ManageOrders";
+import MyOrders from "../pages/Dashboard/Customer/MyOrders";
+import { createBrowserRouter } from "react-router";
+import AllIssues from "../pages/AllIssues/AllIssues";
+import IssueDetails from "../pages/IssueDetails/IssueDetails";
+import MyIssues from "../pages/Dashboard/Citizen/MyIssues/MyIssues";
+import ReportIssue from "../pages/Dashboard/Citizen/ReportIssue/ReportIssue";
+import CitizenProfile from "../pages/Dashboard/Citizen/CityzenProfile/CitizenProfile";
+import AssignedIssues from "../pages/Dashboard/Staff/AssignIssues/AssignIssues";
+import StaffProfile from "../pages/Dashboard/Staff/StaffProfile/StaffProfile";
+import AdminIssues from "../pages/Dashboard/Admin/AllIssues/AdminIssues";
 
 export const router = createBrowserRouter([
   {
-    path: '/',
+    path: "/",
     element: <MainLayout />,
     errorElement: <ErrorPage />,
     children: [
       {
-        path: '/',
+        path: "/",
         element: <Home />,
       },
       {
-        path: '/all-issues',       // ✅ new route
+        path: "/all-issues", // ✅ new route
         element: <AllIssues />,
       },
       {
-        path: '/plant/:id',
+        path: "/issue-details/:id", // ✅ new route
+        element: (
+          <PrivateRoute>
+            <IssueDetails />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/plant/:id",
         element: <PlantDetails />,
       },
     ],
   },
-  { path: '/login', element: <Login /> },
-  { path: '/signup', element: <SignUp /> },
+  { path: "/login", element: <Login /> },
+  { path: "/signup", element: <SignUp /> },
   {
-    path: '/dashboard',
+    path: "/dashboard",
     element: (
       <PrivateRoute>
         <DashboardLayout />
@@ -55,23 +70,70 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'add-plant',
+        path: "add-plant",
         element: (
           <PrivateRoute>
             <AddPlant />
           </PrivateRoute>
         ),
       },
+      // citizen part
       {
-        path: 'my-inventory',
+        path: "my-issues",
         element: (
           <PrivateRoute>
-            <MyInventory />
+            <MyIssues />
           </PrivateRoute>
         ),
       },
       {
-        path: 'manage-users',
+        path: "report-issue",
+        element: (
+          <PrivateRoute>
+            <ReportIssue />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "cityzen-profile",
+        element: (
+          <PrivateRoute>
+            <CitizenProfile />
+          </PrivateRoute>
+        ),
+      },
+      // ----------
+      // ---Staff only-----
+      {
+        path: "assigned-issues",
+        element: (
+          <PrivateRoute>
+            <AssignedIssues />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "staff-profile",
+        element: (
+          <PrivateRoute>
+            <StaffProfile />
+          </PrivateRoute>
+        ),
+      },
+      // ------
+      // ---Admin only---
+      {
+        path: "admin-issues",
+        element: (
+          <PrivateRoute>
+            <AdminIssues />
+          </PrivateRoute>
+        ),
+      },
+
+      // ------
+      {
+        path: "manage-users",
         element: (
           <PrivateRoute>
             <ManageUsers />
@@ -79,7 +141,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'profile',
+        path: "profile",
         element: (
           <PrivateRoute>
             <Profile />
@@ -87,7 +149,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'my-orders',
+        path: "my-orders",
         element: (
           <PrivateRoute>
             <MyOrders />
@@ -95,9 +157,9 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'manage-orders',
+        path: "manage-orders",
         element: <ManageOrders />,
       },
     ],
   },
-])
+]);
