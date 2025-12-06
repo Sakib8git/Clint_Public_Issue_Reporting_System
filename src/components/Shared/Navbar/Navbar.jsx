@@ -5,11 +5,10 @@ import { Link } from "react-router";
 import useAuth from "../../../hooks/useAuth";
 import avatarImg from "../../../assets/images/placeholder.jpg";
 
-
 const Navbar = () => {
   const { user, logOut } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
-// console.log(user.displayName);
+
   return (
     <div className="fixed w-full bg-white z-10 shadow-sm">
       <div className="py-4 ">
@@ -17,7 +16,6 @@ const Navbar = () => {
           <div className="flex flex-row items-center justify-between gap-3 md:gap-0">
             {/* Logo */}
             <Link to="/">
-              {/* <img src={logo} alt='logo' width='100' height='100' /> */}
               <h2 className="text-4xl font-extrabold bg-gradient-to-r from-green-500 to-blue-600 bg-clip-text text-transparent">
                 ReportHub
               </h2>
@@ -36,6 +34,13 @@ const Navbar = () => {
                 className="text-sm font-semibold hover:text-green-600 transition"
               >
                 All Reports
+              </Link>
+              {/* About link - hidden on small screens */}
+              <Link
+                to="/about"
+                className="hidden md:block text-sm font-semibold hover:text-blue-500 transition"
+              >
+                About
               </Link>
             </div>
 
@@ -67,10 +72,7 @@ const Navbar = () => {
                   <div className="flex flex-col cursor-pointer">
                     {user ? (
                       <>
-                        <div
-                          
-                          className="px-4 py-3 hover:bg-neutral-100 transition font-semibold cursor-pointer"
-                        >
+                        <div className="px-4 py-3 hover:bg-neutral-100 transition font-semibold cursor-pointer">
                           {user.displayName}
                         </div>
                         <Link

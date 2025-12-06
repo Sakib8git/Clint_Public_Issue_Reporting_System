@@ -9,6 +9,7 @@ import { BsGraphUp } from "react-icons/bs";
 import { FaListAlt, FaBolt, FaUserShield, FaUsersCog } from "react-icons/fa";
 import { CgProfile } from "react-icons/cg";
 import { GrUserWorker } from "react-icons/gr";
+import { MdOutlinePayment } from "react-icons/md";
 const Sidebar = () => {
   const { logOut } = useAuth();
   const location = useLocation();
@@ -75,7 +76,7 @@ const Sidebar = () => {
           >
             <BsGraphUp className="w-5 h-5" />
           </Link>
-
+          {/* note:cityzen */}
           <Link
             to="/dashboard/my-issues"
             className={`p-3 rounded-lg hover:bg-white hover:text-green-600 transition ${isActiveLink(
@@ -105,6 +106,8 @@ const Sidebar = () => {
           >
             <CgProfile className="w-5 h-5" />
           </Link>
+
+          {/* note:staff */}
           {/* profile- staff------ */}
           <Link
             to="/dashboard/staff-profile"
@@ -125,7 +128,7 @@ const Sidebar = () => {
           >
             <FaUserShield className="w-5 h-5" />
           </Link>
-
+          {/* note:Admin */}
           <Link
             to="/dashboard/admin-issues"
             className={`p-3 rounded-lg hover:bg-white hover:text-green-600 transition ${isActiveLink(
@@ -154,6 +157,16 @@ const Sidebar = () => {
             title="Manage Staff"
           >
             <FaUserShield className="w-5 h-5" />
+          </Link>
+
+          <Link
+            to="/dashboard/payments"
+            className={`p-3 rounded-lg hover:bg-white hover:text-green-600 transition ${isActiveLink(
+              "/dashboard/payments"
+            )}`}
+            title="Payments"
+          >
+            <MdOutlinePayment className="w-5 h-5" />
           </Link>
 
           <Link
