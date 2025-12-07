@@ -5,17 +5,41 @@ import toast from "react-hot-toast";
 import Button from "../../../../components/Shared/Button/Button";
 import Container from "../../../../components/Shared/Container";
 import FileUpload from "../../../../components/Form/FileUpload/FileUpload";
+import useAuth from "../../../../hooks/useAuth";
+import { useMutation } from "@tanstack/react-query";
+import useAxiosSecure from "../../../../hooks/useAxiosSecure";
+import { imageUplode } from "../../../../utils";
+import LoadingSpinner from "../../../../components/Shared/LoadingSpinner";
+// import axios from "axios";
 
 const ReportIssue = () => {
-  const navigate = useNavigate();
+  const { user } = useAuth();
+  const axiosSecure = useAxiosSecure();
 
-  const user = {
-    role: "citizen",
-    subscription: "free",
-    issuesCount: 2,
-    name: "Nazmus Sakib",
-    email: "nazmus@example.com",
-  };
+  const {
+    isPending,
+    isError,
+    mutateAsync,
+    reset: mutationReset,
+  } = useMutation({
+    mutationFn: async (payload) => {
+      return await axiosSecure.post(
+        `${import.meta.env.VITE_API_URL}/reports`,
+        payload
+      );
+    },
+    onSuccess: (data) => {
+      console.log(data);
+      toast.success("Issue reported successfully!");
+      mutationReset();
+    },
+    onError: (error) => {
+      console.log(error);
+      toast.error("Failed to submit issue!");
+    },
+  });
+
+  const navigate = useNavigate();
 
   const {
     register,
@@ -24,21 +48,47 @@ const ReportIssue = () => {
     formState: { errors },
   } = useForm();
 
-  const onSubmit = (data) => {
-    console.log("Form Data:", data);
+  const onSubmit = async (data) => {
+    const { title, description, image, category, location } = data;
+    const imageFile = image[0];
 
-    // ✅ Show success toast
-    toast.success("Issue submitted successfully!");
+    try {
+      const imageUrl = await imageUplode(imageFile);
 
-    // ✅ Reset form
-    reset();
+      const reportData = {
+        image: imageUrl,
+        title,
+        description,
+        location,
+        category,
+        status: "Pending",
+        priority: "Normal",
+        upvote: 0,
+        reporter: {
+          email: user?.email,
+          name: user?.displayName,
+          image: user?.photoURL,
+        },
+      };
 
-    // ✅ Navigate to My Issues page
-    navigate("/dashboard/my-issues");
+      await mutateAsync(reportData);
+
+      // ✅ Reset form
+      reset();
+
+      // ✅ Navigate to My Issues page
+      navigate("/dashboard/my-issues");
+    } catch (err) {
+      console.log(err);
+      toast.error("Something went wrong!");
+    }
   };
 
   const isFreeLimitReached =
-    user.subscription === "free" && user.issuesCount >= 3;
+    user?.subscription === "free" && user?.issuesCount >= 3;
+
+  if (isPending) return <LoadingSpinner />;
+  if (isError) return <p>Error submitting issue</p>;
 
   return (
     <Container>
@@ -65,7 +115,7 @@ const ReportIssue = () => {
               <label className="block font-semibold mb-1">Name</label>
               <input
                 type="text"
-                defaultValue={user.name}
+                defaultValue={user?.displayName}
                 readOnly
                 {...register("name")}
                 className="w-full border rounded px-3 py-2 bg-gray-100 cursor-not-allowed"
@@ -77,7 +127,7 @@ const ReportIssue = () => {
               <label className="block font-semibold mb-1">Email</label>
               <input
                 type="email"
-                defaultValue={user.email}
+                defaultValue={user?.email}
                 readOnly
                 {...register("email")}
                 className="w-full border rounded px-3 py-2 bg-gray-100 cursor-not-allowed"
