@@ -1,5 +1,5 @@
 import React from "react";
-import IssueCard from "./IssueCard ";
+import IssueCard from "./IssueCard";
 const LatestResolvedIssues = () => {
   return (
     <div className="container mx-auto px-4 py-8">

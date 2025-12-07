@@ -11,7 +11,6 @@ import Profile from "../pages/Dashboard/Common/Profile";
 import Statistics from "../pages/Dashboard/Common/Statistics";
 import MainLayout from "../layouts/MainLayout";
 
-
 import { createBrowserRouter } from "react-router";
 import AllIssues from "../pages/AllIssues/AllIssues";
 import IssueDetails from "../pages/IssueDetails/IssueDetails";
@@ -36,7 +35,7 @@ export const router = createBrowserRouter([
         element: <Home />,
       },
       {
-        path: "/all-issues", 
+        path: "/all-issues",
         element: <AllIssues />,
       },
       {
@@ -51,7 +50,6 @@ export const router = createBrowserRouter([
           </PrivateRoute>
         ),
       },
-      
     ],
   },
   { path: "/login", element: <Login /> },
@@ -150,7 +148,7 @@ export const router = createBrowserRouter([
           </PrivateRoute>
         ),
       },
-     
+
       {
         path: "profile",
         element: (
@@ -159,9 +157,15 @@ export const router = createBrowserRouter([
           </PrivateRoute>
         ),
       },
+      {
+        path: "payments",
+        element: (
+          <PrivateRoute>
+            <Payments />
+          </PrivateRoute>
+        ),
+      },
       // ------
-      
-      
     ],
   },
 ]);

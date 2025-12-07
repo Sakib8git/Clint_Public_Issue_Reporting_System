@@ -5,7 +5,7 @@ import useAxiosSecure from "../../hooks/useAxiosSecure";
 import LoadingSpinner from "../Shared/LoadingSpinner";
 import Container from "../Shared/Container";
 
-const Issues = () => {
+const IssuesCard = () => {
   const axiosSecure = useAxiosSecure();
 
   const {
@@ -107,4 +107,4 @@ const Issues = () => {
   );
 };
 
-export default Issues;
+export default IssuesCard;

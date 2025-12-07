@@ -1,6 +1,6 @@
 import React from "react";
 import Container from "../../components/Shared/Container";
-import IssueCard from "../../components/Home/IssueCard ";
+import IssueCard from "../../components/Home/IssueCard";
 
 const AllIssues = () => {
   return (
