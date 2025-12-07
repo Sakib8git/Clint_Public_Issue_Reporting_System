@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router";
 import useAuth from "../../../hooks/useAuth";
-
+import { AiTwotoneHome } from "react-icons/ai";
 // Icons
 import { GrLogout } from "react-icons/gr";
 import { FcSettings } from "react-icons/fc";
@@ -62,7 +62,7 @@ const Sidebar = () => {
           to="/"
           className="hidden md:block mb-6 text-xl font-extrabold bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent"
         >
-          RH
+          <AiTwotoneHome />
         </Link>
 
         {/* Menu Icons */}

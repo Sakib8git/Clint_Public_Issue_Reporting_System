@@ -1,6 +1,6 @@
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "react-router"; 
+import { Link } from "react-router"; // ✅ correct import
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 import LoadingSpinner from "../Shared/LoadingSpinner";
 import Container from "../Shared/Container";
@@ -18,7 +18,7 @@ const Issues = () => {
       const result = await axiosSecure.get(
         `${import.meta.env.VITE_API_URL}/reports`
       );
-      console.log("Fetched Issues:", result.data);
+      console.log("Fetched Issues:", result.data); // ✅ check DB data
       return result.data;
     },
   });
@@ -29,11 +29,11 @@ const Issues = () => {
   return (
     <Container>
       {issues && issues.length > 0 ? (
-        <div className="pt-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 justify-center">
+        <div className="pt-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
           {issues.map((issue) => (
             <div
               key={issue._id}
-              className="w-[300px] h-[420px] border rounded-lg shadow-md overflow-hidden bg-white hover:shadow-lg transition-shadow duration-300 flex flex-col"
+              className=" rounded-lg shadow-md overflow-hidden bg-white"
             >
               {/* Image */}
               <img
@@ -43,48 +43,46 @@ const Issues = () => {
               />
 
               {/* Content */}
-              <div className="p-4 flex-1 flex flex-col justify-between">
-                <div>
-                  <h3 className="text-lg font-semibold mb-1">{issue.title}</h3>
-                  <p className="text-sm text-gray-600 mb-1">
-                    Category: {issue.category}
-                  </p>
-                  <p className="text-sm mb-1">
-                    Status:{" "}
-                    <span className="font-bold text-blue-600">
-                      {issue.status}
-                    </span>
-                  </p>
-                  <p className="text-sm mb-1">
-                    Priority:{" "}
-                    <span
-                      className={
-                        issue.priority === "High"
-                          ? "text-red-600 font-bold"
-                          : "text-green-600 font-bold"
-                      }
-                    >
-                      {issue.priority}
-                    </span>
-                  </p>
-                  <p className="text-sm text-gray-600 mb-1">
-                    Location: {issue.location}
-                  </p>
+              <div className="p-4">
+                <h3 className="text-lg font-semibold mb-1">{issue.title}</h3>
+                <p className="text-sm text-gray-600 mb-1">
+                  Category: {issue.category}
+                </p>
+                <p className="text-sm mb-1">
+                  Status:{" "}
+                  <span className="font-bold text-blue-600">
+                    {issue.status}
+                  </span>
+                </p>
+                <p className="text-sm mb-1">
+                  Priority:{" "}
+                  <span
+                    className={
+                      issue.priority === "High"
+                        ? "text-red-600 font-bold"
+                        : "text-green-600 font-bold"
+                    }
+                  >
+                    {issue.priority}
+                  </span>
+                </p>
+                <p className="text-sm text-gray-600 mb-1">
+                  Location: {issue.location}
+                </p>
 
-                  {/* Description */}
-                  {issue.description && (
-                    <p className="text-sm text-gray-700 mb-2 line-clamp-2">
-                      {issue.description}
-                    </p>
-                  )}
+                {/* Description */}
+                {issue.description && (
+                  <p className="text-sm text-gray-700 mb-2 line-clamp-2">
+                    {issue.description}
+                  </p>
+                )}
 
-                  {/* Reporter Info */}
-                  {issue.reporter && (
-                    <p className="text-xs text-gray-500">
-                      Reported by: {issue.reporter.name} ({issue.reporter.email})
-                    </p>
-                  )}
-                </div>
+                {/* Reporter Info */}
+                {issue.reporter && (
+                  <p className="text-xs text-gray-500">
+                    Reported by: {issue.reporter.name} ({issue.reporter.email})
+                  </p>
+                )}
 
                 {/* Footer: Upvote + View Details */}
                 <div className="flex justify-between items-center mt-4">

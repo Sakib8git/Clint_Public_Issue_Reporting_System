@@ -1,6 +1,11 @@
 import React, { useState } from "react";
 import { Link } from "react-router";
 import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
+import { useQuery } from "@tanstack/react-query";
+
+
+import useAxiosSecure from "../../../../hooks/useAxiosSecure";
+import LoadingSpinner from "../../../../components/Shared/LoadingSpinner";
 
 const MyIssues = () => {
   const [filterStatus, setFilterStatus] = useState("");
@@ -8,27 +13,28 @@ const MyIssues = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedIssue, setSelectedIssue] = useState(null);
 
-  // Dummy issues data
-  const issues = [
-    {
-      id: 1,
-      title: "Broken Streetlight",
-      category: "Streetlight",
-      status: "Pending",
-      location: "Khulna City",
-      description: "Streetlight near bazar is broken.",
-    },
-    {
-      id: 2,
-      title: "Pothole on Main Road",
-      category: "Road",
-      status: "In-Progress",
-      location: "Khulna Highway",
-      description: "Large pothole causing traffic issues.",
-    },
-  ];
+  const axiosSecure = useAxiosSecure();
 
-  // Filtered issues
+  // ✅ Fetch issues from backend
+  const {
+    data: issues = [],
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["my-issues"],
+    queryFn: async () => {
+      const res = await axiosSecure.get(
+        `${import.meta.env.VITE_API_URL}/dashboard/my-issues`
+      );
+      console.log(res.data);
+      return res.data;
+    },
+  });
+
+  if (isLoading) return <LoadingSpinner />;
+  if (isError) return <p className="text-red-500">Failed to load issues</p>;
+
+  // ✅ Filtered issues
   const filteredIssues = issues.filter(
     (issue) =>
       (filterStatus ? issue.status === filterStatus : true) &&
@@ -74,7 +80,7 @@ const MyIssues = () => {
       <div className="space-y-4">
         {filteredIssues.map((issue) => (
           <div
-            key={issue.id}
+            key={issue._id} // ✅ use MongoDB _id
             className="border rounded-lg p-4 shadow flex justify-between items-center"
           >
             <div>
@@ -114,7 +120,7 @@ const MyIssues = () => {
                 <FaTrash /> Delete
               </button>
               <Link
-                to={`/issue-details/${issue.id}`}
+                to={`/issue-details/${issue._id}`} // ✅ navigate by _id
                 className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 flex items-center gap-1"
               >
                 <FaEye /> View

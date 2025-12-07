@@ -64,6 +64,7 @@ const ReportIssue = () => {
         status: "Pending",
         priority: "Normal",
         upvote: 0,
+        createdAt: new Date().toISOString(),
         reporter: {
           email: user?.email,
           name: user?.displayName,

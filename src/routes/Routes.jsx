@@ -11,8 +11,7 @@ import Profile from "../pages/Dashboard/Common/Profile";
 import Statistics from "../pages/Dashboard/Common/Statistics";
 import MainLayout from "../layouts/MainLayout";
 
-import ManageOrders from "../pages/Dashboard/Seller/ManageOrders";
-import MyOrders from "../pages/Dashboard/Customer/MyOrders";
+
 import { createBrowserRouter } from "react-router";
 import AllIssues from "../pages/AllIssues/AllIssues";
 import IssueDetails from "../pages/IssueDetails/IssueDetails";
@@ -37,7 +36,7 @@ export const router = createBrowserRouter([
         element: <Home />,
       },
       {
-        path: "/all-issues", // ✅ new route
+        path: "/all-issues", 
         element: <AllIssues />,
       },
       {
@@ -45,7 +44,7 @@ export const router = createBrowserRouter([
         element: <About />,
       },
       {
-        path: "/issue-details/:id", // ✅ new route
+        path: "/issue-details/:id",
         element: (
           <PrivateRoute>
             <IssueDetails />
@@ -151,14 +150,7 @@ export const router = createBrowserRouter([
           </PrivateRoute>
         ),
       },
-      {
-        path: "payments",
-        element: (
-          <PrivateRoute>
-            <Payments />
-          </PrivateRoute>
-        ),
-      },
+     
       {
         path: "profile",
         element: (
@@ -168,18 +160,8 @@ export const router = createBrowserRouter([
         ),
       },
       // ------
-      {
-        path: "my-orders",
-        element: (
-          <PrivateRoute>
-            <MyOrders />
-          </PrivateRoute>
-        ),
-      },
-      {
-        path: "manage-orders",
-        element: <ManageOrders />,
-      },
+      
+      
     ],
   },
 ]);
