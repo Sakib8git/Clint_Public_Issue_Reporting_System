@@ -1,16 +1,19 @@
 import React from "react";
-import { useParams } from "react-router"; // jemon tumi chaicho
+import { useNavigate, useParams } from "react-router"; // jemon tumi chaicho
 import { useQuery } from "@tanstack/react-query";
 import { FaEdit, FaTrash, FaBolt } from "react-icons/fa";
 import Container from "../../components/Shared/Container";
 import LoadingSpinner from "../../components/Shared/LoadingSpinner";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 import useAuth from "../../hooks/useAuth";
+import toast from "react-hot-toast";
+import Swal from "sweetalert2";
 
 const IssueDetails = () => {
   const { user } = useAuth();
   const { id } = useParams();
   const axiosSecure = useAxiosSecure();
+  const navigate = useNavigate();
 
   const {
     data: issue,
@@ -25,7 +28,51 @@ const IssueDetails = () => {
       return res.data;
     },
   });
+  
 
+const handleDelete = async () => {
+  Swal.fire({
+    title: "Are you sure?",
+    text: "You won't be able to revert this!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#3085d6",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "Yes, delete it!"
+  }).then(async (result) => {
+    if (result.isConfirmed) {
+      try {
+        const res = await axiosSecure.delete(
+          `${import.meta.env.VITE_API_URL}/reports/${id}`
+        );
+
+        if (res.data.deletedCount > 0) {
+          Swal.fire({
+            title: "Deleted!",
+            text: "Your issue has been deleted.",
+            icon: "success"
+          });
+          toast.success("Issue deleted successfully!");
+          navigate("/"); // ✅ redirect after delete
+        } else {
+          Swal.fire({
+            title: "Not Authorized",
+            text: "You cannot delete this issue.",
+            icon: "error"
+          });
+          toast.error("You are not authorized to delete this issue!");
+        }
+      } catch (err) {
+        Swal.fire({
+          title: "Error!",
+          text: "Failed to delete issue.",
+          icon: "error"
+        });
+        toast.error("Failed to delete issue");
+      }
+    }
+  });
+};
   if (isLoading) return <LoadingSpinner />;
   if (isError) return <p className="text-red-500">Failed to load issue</p>;
 
@@ -76,7 +123,10 @@ const IssueDetails = () => {
               </p>
               <p>
                 <span className="font-semibold ">Priority:</span>{" "}
-                <span className="text-green-600 font-semibold"> {issue.priority}</span>
+                <span className="text-green-600 font-semibold">
+                  {" "}
+                  {issue.priority}
+                </span>
               </p>
               <p>
                 <span className="font-semibold">Location:</span>{" "}
@@ -103,7 +153,10 @@ const IssueDetails = () => {
                   </button>
                 )}
                 {canDelete && (
-                  <button className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
+                  <button
+                    onClick={handleDelete}
+                    className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                  >
                     <FaTrash /> Delete
                   </button>
                 )}
