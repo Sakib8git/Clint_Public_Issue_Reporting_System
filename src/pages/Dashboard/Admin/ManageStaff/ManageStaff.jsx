@@ -1,29 +1,12 @@
 import React, { useState } from "react";
 import Swal from "sweetalert2";
 import toast from "react-hot-toast";
+import { useQuery } from "@tanstack/react-query";
+import useAxiosSecure from "../../../../hooks/useAxiosSecure";
 import StaffModal from "../../../../components/Modal/StaffModal";
 
-const dummyStaff = [
-  {
-    id: "STAFF001",
-    name: "Staff A",
-    email: "staffa@example.com",
-    phone: "0123456789",
-    photo: "https://via.placeholder.com/50",
-    role: "staff",
-  },
-  {
-    id: "STAFF002",
-    name: "Staff B",
-    email: "staffb@example.com",
-    phone: "0987654321",
-    photo: "https://via.placeholder.com/50",
-    role: "staff",
-  },
-];
-
 const ManageStaff = () => {
-  const [staffList, setStaffList] = useState(dummyStaff);
+  const axiosSecure = useAxiosSecure();
   const [showAddModal, setShowAddModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [formData, setFormData] = useState({
@@ -32,34 +15,81 @@ const ManageStaff = () => {
     phone: "",
     photo: "",
     password: "",
+    role: "staff",
   });
 
-  // Handle Add Staff
-  const handleAddStaff = () => {
-    const newStaff = {
-      id: `STAFF${staffList.length + 1}`,
-      ...formData,
-      role: "staff",
-    };
-    setStaffList([...staffList, newStaff]);
-    toast.success("Staff added successfully!");
-    setShowAddModal(false);
-    setFormData({ name: "", email: "", phone: "", photo: "", password: "" });
-    console.log("Firebase Auth + DB save:", newStaff);
+  // ✅ Fetch staff list from DB
+  const {
+    data: staffList = [],
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryKey: ["staff"],
+    queryFn: async () => {
+      const res = await axiosSecure.get(
+        `${import.meta.env.VITE_API_URL}/staff`
+      );
+      return res.data;
+    },
+  });
+
+  if (isLoading) return <p>Loading staff...</p>;
+
+  // ✅ Add Staff
+  const handleAddStaff = async () => {
+    try {
+      if (!formData.name || !formData.email || !formData.phone) {
+        toast.error("Please fill all required fields");
+        return;
+      }
+      const res = await axiosSecure.post(
+        `${import.meta.env.VITE_API_URL}/staff`,
+        formData
+      );
+      if (res.data.insertedId) {
+        toast.success("Staff added successfully!");
+        refetch();
+        setShowAddModal(false);
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          photo: "",
+          password: "",
+          role: "staff",
+        });
+      }
+    } catch (err) {
+      toast.error("Failed to add staff");
+    }
   };
 
-  // Handle Update Staff
-  const handleUpdateStaff = () => {
-    const updated = staffList.map((s) =>
-      s.id === formData.id ? { ...s, ...formData } : s
-    );
-    setStaffList(updated);
-    toast.success("Staff updated successfully!");
-    setShowUpdateModal(false);
-    console.log("DB updated:", formData);
+  // ✅ Update Staff (only name + phone)
+  const handleUpdateStaff = async () => {
+    try {
+      if (!formData._id) {
+        toast.error("Invalid staff record");
+        return;
+      }
+      const updatePayload = {
+        name: formData.name,
+        phone: formData.phone,
+      };
+      const res = await axiosSecure.patch(
+        `${import.meta.env.VITE_API_URL}/staff/${formData._id}`,
+        updatePayload
+      );
+      if (res.data.modifiedCount > 0) {
+        toast.success("Staff updated successfully!");
+        refetch();
+        setShowUpdateModal(false);
+      }
+    } catch (err) {
+      toast.error("Failed to update staff");
+    }
   };
 
-  // Handle Delete Staff
+  // ✅ Delete Staff
   const handleDeleteStaff = (id) => {
     Swal.fire({
       title: "Are you sure?",
@@ -69,12 +99,23 @@ const ManageStaff = () => {
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
       confirmButtonText: "Yes, delete it!",
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        const updated = staffList.filter((s) => s.id !== id);
-        setStaffList(updated);
-        Swal.fire("Deleted!", "Staff has been removed.", "success");
-        console.log("DB deleted:", id);
+        try {
+          const res = await axiosSecure.delete(
+            `${import.meta.env.VITE_API_URL}/staff/${id}`
+          );
+
+          if (res?.data?.deletedCount > 0) {
+            Swal.fire("Deleted!", "Staff has been removed.", "success");
+            refetch();
+          } else {
+            toast.error("No staff found to delete");
+          }
+        } catch (err) {
+          console.error("Delete staff error:", err);
+          toast.error("Failed to delete staff");
+        }
       }
     });
   };
@@ -86,7 +127,14 @@ const ManageStaff = () => {
       {/* Add Staff Button */}
       <button
         onClick={() => {
-          setFormData({ name: "", email: "", phone: "", photo: "", password: "" });
+          setFormData({
+            name: "",
+            email: "",
+            phone: "",
+            photo: "",
+            password: "",
+            role: "staff",
+          });
           setShowAddModal(true);
         }}
         className="bg-blue-500 px-4 py-2 rounded text-white hover:bg-blue-700 mb-4"
@@ -108,13 +156,19 @@ const ManageStaff = () => {
         </thead>
         <tbody>
           {staffList.map((staff) => (
-            <tr key={staff.id}>
+            <tr key={staff._id}>
               <td className="p-2">
-                <img
-                  src={staff.photo}
-                  alt={staff.name}
-                  className="h-10 w-10 rounded-full object-cover"
-                />
+                {staff.photo ? (
+                  <img
+                    src={staff.photo}
+                    alt={staff.name}
+                    className="h-10 w-10 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center text-xs text-gray-600">
+                    No Photo
+                  </div>
+                )}
               </td>
               <td className="p-2">{staff.name}</td>
               <td className="p-2">{staff.email}</td>
@@ -131,7 +185,7 @@ const ManageStaff = () => {
                   Update
                 </button>
                 <button
-                  onClick={() => handleDeleteStaff(staff.id)}
+                  onClick={() => handleDeleteStaff(staff._id)}
                   className="bg-red-500 px-3 py-1 rounded text-white hover:bg-red-700"
                 >
                   Delete
@@ -147,22 +201,32 @@ const ManageStaff = () => {
         isOpen={showAddModal}
         close={() => setShowAddModal(false)}
         title="Add Staff"
-        fields={["name", "email", "phone", "photo", "password"]}
+        fields={["name", "email", "phone", "photo", "password", "role"]}
         formData={formData}
         setFormData={setFormData}
         onConfirm={handleAddStaff}
       />
 
-      {/* Update Staff Modal */}
+      {/* Update Staff Modal (only name + phone) */}
       <StaffModal
         isOpen={showUpdateModal}
         close={() => setShowUpdateModal(false)}
         title="Update Staff"
-        fields={["name", "email", "phone", "photo"]}
+        fields={["name", "phone"]}
         formData={formData}
         setFormData={setFormData}
         onConfirm={handleUpdateStaff}
       />
+      {/* <StaffModal
+        isOpen={showUpdateModal}
+        close={() => setShowUpdateModal(false)}
+        title="Update Staff"
+        // ✅ Only name + phone editable, email readonly
+        fields={["name", "phone", "email"]}
+        formData={formData}
+        setFormData={setFormData}
+        onConfirm={handleUpdateStaff}
+      /> */}
     </div>
   );
 };

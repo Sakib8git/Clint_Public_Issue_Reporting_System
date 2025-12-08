@@ -32,7 +32,7 @@ const IssuesCard = () => {
 
       if (res.data.result?.modifiedCount > 0) {
         toast.success("Upvoted successfully!");
-        refetch(); // refresh issues list
+        refetch();
       } else {
         toast.error(res.data.message || "Already upvoted");
       }
@@ -108,7 +108,7 @@ const IssuesCard = () => {
                     onClick={() => handleUpvote(issue._id)}
                     className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
                   >
-                  👍🏻Upvote ({issue.upvote || 0})
+                    👍🏻Upvote ({issue.upvote || 0})
                   </button>
                   <Link
                     to={`/issue-details/${issue._id}`}

@@ -1,70 +1,123 @@
-import { Dialog, DialogPanel, DialogTitle, Button } from "@headlessui/react";
-import { useForm } from "react-hook-form";
+import React, { useState } from "react";
+import { imageUplode } from "../../utils";
 
-export default function StaffModal({ isOpen, close, title, fields, onConfirm, initialData }) {
-  const { register, handleSubmit, reset } = useForm({
-    defaultValues: initialData || {
-      name: "",
-      email: "",
-      phone: "",
-      photo: "",
-      password: "",
-    },
-  });
+const StaffModal = ({
+  isOpen,
+  close,
+  title,
+  fields,
+  formData,
+  setFormData,
+  onConfirm,
+}) => {
+  const [uploading, setUploading] = useState(false);
 
-  const submitForm = (data) => {
-    // photo file handle
-    if (data.photo && data.photo[0]) {
-      data.photo = URL.createObjectURL(data.photo[0]); // preview URL (later backend upload)
+  if (!isOpen) return null;
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleImageChange = async (e) => {
+    const imageFile = e.target.files[0];
+    if (!imageFile) return;
+    setUploading(true);
+    try {
+      const imageUrl = await imageUplode(imageFile);
+      setFormData((prev) => ({ ...prev, photo: imageUrl }));
+    } catch (err) {
+      alert("Image upload failed");
+    } finally {
+      setUploading(false);
     }
-    onConfirm(data);
-    reset();
-    close();
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (
+      !formData.name ||
+      !formData.email ||
+      !formData.phone ||
+      !formData.role
+    ) {
+      alert("Please fill all required fields");
+      return;
+    }
+    onConfirm();
   };
 
   return (
-    <Dialog open={isOpen} as="div" className="relative z-10 focus:outline-none" onClose={close}>
-      <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
-        <div className="flex min-h-full items-center justify-center p-4">
-          <DialogPanel
-            transition
-            className="w-full max-w-md rounded-xl bg-white p-6 shadow-lg duration-300 ease-out data-closed:transform-[scale(95%)] data-closed:opacity-0"
-          >
-            <DialogTitle as="h3" className="text-lg font-bold text-gray-800 mb-4">
-              {title}
-            </DialogTitle>
+    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-lg">
+        <h2 className="text-xl font-bold mb-4">{title}</h2>
 
-            <form onSubmit={handleSubmit(submitForm)}>
-              {fields.map((field) => (
-                <div key={field} className="mb-3">
-                  <label className="block text-sm font-medium capitalize mb-1">{field}</label>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {fields.map((field) => (
+            <div key={field}>
+              <label className="block text-sm font-medium capitalize mb-1">
+                {field}
+              </label>
+              {field === "role" ? (
+                <select
+                  name="role"
+                  value={formData.role}
+                  onChange={handleChange}
+                  className="w-full border px-3 py-2 rounded"
+                >
+                  <option value="staff">Staff</option>
+                </select>
+              ) : field === "photo" ? (
+                <>
                   <input
-                    type={field === "password" ? "password" : field === "photo" ? "file" : "text"}
-                    {...register(field, { required: true })}
-                    className="border px-3 py-2 rounded w-full"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="w-full border px-3 py-2 rounded"
                   />
-                </div>
-              ))}
+                  {uploading && (
+                    <p className="text-sm text-gray-500">Uploading...</p>
+                  )}
+                  {formData.photo && (
+                    <img
+                      src={formData.photo}
+                      alt="Preview"
+                      className="h-16 w-16 rounded-full object-cover mt-2"
+                    />
+                  )}
+                </>
+              ) : (
+                <input
+                  type={field === "password" ? "password" : "text"}
+                  name={field}
+                  value={formData[field]}
+                  onChange={handleChange}
+                  className="w-full border px-3 py-2 rounded"
+                />
+              )}
+            </div>
+          ))}
 
-              <div className="flex justify-end gap-3 mt-4">
-                <Button
-                  type="button"
-                  onClick={close}
-                  className="bg-gray-400 px-4 py-2 rounded text-white hover:bg-gray-600"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  className="bg-blue-500 px-4 py-2 rounded text-white hover:bg-blue-700"
-                >
-                  Confirm
-                </Button>
-              </div>
-            </form>
-          </DialogPanel>
-        </div>
+          <div className="flex justify-end gap-2 mt-4">
+            <button
+              type="button"
+              onClick={close}
+              className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            >
+              Confirm
+            </button>
+          </div>
+        </form>
       </div>
-    </Dialog>
+    </div>
   );
-}
+};
+
+export default StaffModal;

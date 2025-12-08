@@ -26,7 +26,10 @@ const useAxiosSecure = () => {
       const responseInterceptor = axiosInstance.interceptors.response.use(
         (res) => res,
         (err) => {
-          if (err?.response?.status === 401 || err?.response?.status === 403) {
+          if (
+            err?.response?.status === 401
+            // || err?.response?.status === 403
+          ) {
             logOut()
               .then(() => {
                 console.log("Logged out successfully.");

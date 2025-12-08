@@ -163,6 +163,10 @@ const IssueDetails = () => {
                 {issue.location}
               </p>
               <p>
+                <span className="font-semibold">Upvote:</span> {issue.upvote}
+              </p>
+
+              <p>
                 <span className="font-semibold">Description:</span>{" "}
                 {issue.description}
               </p>
@@ -219,10 +223,24 @@ const IssueDetails = () => {
               <span className="font-semibold">Email:</span>{" "}
               {issue.reporter.email}
             </p>
+            {issue.lastUpdated && (
+              <p>
+                <span className="font-semibold">Last Updated:</span>{" "}
+                {new Date(issue.lastUpdated).toLocaleString("en-US", {
+                  month: "numeric",
+                  day: "numeric",
+                  year: "numeric",
+                  hour: "numeric",
+                  minute: "numeric",
+                  second: "numeric",
+                  hour12: true,
+                })}
+              </p>
+            )}
           </div>
         )}
         {showModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+          <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center">
             <div className="bg-white rounded-lg p-6 w-96 shadow-lg">
               <h2 className="text-xl font-bold mb-4">Edit Issue</h2>
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -264,52 +282,94 @@ const IssueDetails = () => {
         )}
 
         {/* Staff Info */}
-
-        <div className="bg-gray-100 rounded-lg p-6 mt-8">
-          <h2 className="text-xl font-bold mb-2">Assigned Staff</h2>
-          <p>
-            <span className="font-semibold">Name:</span> John Doe
-          </p>
-          <p>
-            <span className="font-semibold">Role:</span> Road Maintenance
-            Supervisor
-          </p>
-          <p>
-            <span className="font-semibold">Contact:</span> john.doe@city.gov
-          </p>
-          <p>
-            <span className="font-semibold">Assigned On:</span> 12/7/2025, 6:45
-            PM
-          </p>
-          <p className="text-sm text-gray-600 mt-2">
-            Assigned by{" "}
-            <span className="font-semibold text-blue-600">Admin Panel</span>
-          </p>
+        <div className="bg-white shadow rounded-lg p-6 mt-10">
+          <h2 className="text-2xl font-bold mb-6 text-green-700 text-center">
+            Issue Progress Timeline
+          </h2>
         </div>
+        {/* --------------------------- */}
+        <div className="relative border-l border-gray-300 ml-4">
+          {/* Step 1: Reported By */}
+          {issue.reporter && (
+            <div className="mb-10 ml-6">
+              <div className="absolute w-3 h-3 bg-green-500 rounded-full -left-1.5 border border-white"></div>
+              <h3 className="text-lg font-semibold">Reported By</h3>
+              <p className="text-sm text-gray-600">
+                <span className="font-semibold">Name:</span>{" "}
+                {issue.reporter.name}
+              </p>
+              <p className="text-sm text-gray-600">
+                <span className="font-semibold">Email:</span>{" "}
+                {issue.reporter.email}
+              </p>
+              {issue.lastUpdated && (
+                <p className="text-sm text-gray-600">
+                  <span className="font-semibold">Last Updated:</span>{" "}
+                  {new Date(issue.lastUpdated).toLocaleString("en-US", {
+                    month: "numeric",
+                    day: "numeric",
+                    year: "numeric",
+                    hour: "numeric",
+                    minute: "numeric",
+                    second: "numeric",
+                    hour12: true,
+                  })}
+                </p>
+              )}
+            </div>
+          )}
 
-        {/* {issue.staff && (
-          <div className="bg-gray-100 rounded-lg p-6 mt-8">
-            <h2 className="text-xl font-bold mb-2">Assigned Staff</h2>
-            <p>
+          {/* Step 2: Assigned Staff */}
+          <div className="mb-10 ml-6">
+            <div className="absolute w-3 h-3 bg-blue-500 rounded-full -left-1.5 border border-white"></div>
+            <h3 className="text-lg font-semibold">Assigned Staff</h3>
+            <p className="text-sm text-gray-600">
               <span className="font-semibold">Name:</span> John Doe
             </p>
-            <p>
+            <p className="text-sm text-gray-600">
               <span className="font-semibold">Role:</span> Road Maintenance
               Supervisor
             </p>
-            <p>
+            <p className="text-sm text-gray-600">
               <span className="font-semibold">Contact:</span> john.doe@city.gov
             </p>
-            <p>
+            <p className="text-sm text-gray-600">
               <span className="font-semibold">Assigned On:</span> 12/7/2025,
               6:45 PM
             </p>
-            <p className="text-sm text-gray-600 mt-2">
+            <p className="text-xs text-gray-500 mt-1">
               Assigned by{" "}
               <span className="font-semibold text-blue-600">Admin Panel</span>
             </p>
           </div>
-        )} */}
+          {/* ---------------------- */}
+
+          {/* ---------------------- */}
+          {/* Step 3: Resolved (Optional future step) */}
+          {issue.status === "Resolved" && (
+            <div className="mb-10 ml-6">
+              <div className="absolute w-3 h-3 bg-purple-500 rounded-full -left-1.5 border border-white"></div>
+              <h3 className="text-lg font-semibold">Issue Resolved</h3>
+              <p className="text-sm text-gray-600">
+                <span className="font-semibold">Status:</span> {issue.status}
+              </p>
+              {issue.resolvedAt && (
+                <p className="text-sm text-gray-600">
+                  <span className="font-semibold">Resolved On:</span>{" "}
+                  {new Date(issue.resolvedAt).toLocaleString("en-US", {
+                    month: "numeric",
+                    day: "numeric",
+                    year: "numeric",
+                    hour: "numeric",
+                    minute: "numeric",
+                    second: "numeric",
+                    hour12: true,
+                  })}
+                </p>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </Container>
   );
