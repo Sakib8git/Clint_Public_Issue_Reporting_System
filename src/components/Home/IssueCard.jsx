@@ -4,6 +4,7 @@ import { Link } from "react-router"; // ✅ correct import
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 import LoadingSpinner from "../Shared/LoadingSpinner";
 import Container from "../Shared/Container";
+import toast from "react-hot-toast";
 
 const IssuesCard = () => {
   const axiosSecure = useAxiosSecure();
@@ -12,6 +13,7 @@ const IssuesCard = () => {
     data: issues = [],
     isLoading,
     isError,
+    refetch,
   } = useQuery({
     queryKey: ["issues"],
     queryFn: async () => {
@@ -22,6 +24,22 @@ const IssuesCard = () => {
       return result.data;
     },
   });
+  const handleUpvote = async (id) => {
+    try {
+      const res = await axiosSecure.patch(
+        `${import.meta.env.VITE_API_URL}/reports/${id}/upvote`
+      );
+
+      if (res.data.result?.modifiedCount > 0) {
+        toast.success("Upvoted successfully!");
+        refetch(); // refresh issues list
+      } else {
+        toast.error(res.data.message || "Already upvoted");
+      }
+    } catch (err) {
+      toast.error("Failed to upvote");
+    }
+  };
 
   if (isLoading) return <LoadingSpinner />;
   if (isError) return <p className="text-red-500">Failed to load issues</p>;
@@ -86,8 +104,11 @@ const IssuesCard = () => {
 
                 {/* Footer: Upvote + View Details */}
                 <div className="flex justify-between items-center mt-4">
-                  <button className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600">
-                    👍 Upvote ({issue.upvote || 0})
+                  <button
+                    onClick={() => handleUpvote(issue._id)}
+                    className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
+                  >
+                  👍🏻Upvote ({issue.upvote || 0})
                   </button>
                   <Link
                     to={`/issue-details/${issue._id}`}
