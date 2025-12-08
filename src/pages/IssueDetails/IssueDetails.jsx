@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router"; // jemon tumi chaicho
 import { useQuery } from "@tanstack/react-query";
 import { FaEdit, FaTrash, FaBolt } from "react-icons/fa";
@@ -8,17 +8,19 @@ import useAxiosSecure from "../../hooks/useAxiosSecure";
 import useAuth from "../../hooks/useAuth";
 import toast from "react-hot-toast";
 import Swal from "sweetalert2";
-
+import { useForm } from "react-hook-form";
 const IssueDetails = () => {
   const { user } = useAuth();
   const { id } = useParams();
   const axiosSecure = useAxiosSecure();
   const navigate = useNavigate();
+  const [showModal, setShowModal] = useState(false);
 
   const {
     data: issue,
     isLoading,
     isError,
+    refetch,
   } = useQuery({
     queryKey: ["issue", id],
     queryFn: async () => {
@@ -28,51 +30,79 @@ const IssueDetails = () => {
       return res.data;
     },
   });
-  
 
-const handleDelete = async () => {
-  Swal.fire({
-    title: "Are you sure?",
-    text: "You won't be able to revert this!",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#3085d6",
-    cancelButtonColor: "#d33",
-    confirmButtonText: "Yes, delete it!"
-  }).then(async (result) => {
-    if (result.isConfirmed) {
-      try {
-        const res = await axiosSecure.delete(
-          `${import.meta.env.VITE_API_URL}/reports/${id}`
-        );
+  //!note: edit----------------------------------------------
 
-        if (res.data.deletedCount > 0) {
-          Swal.fire({
-            title: "Deleted!",
-            text: "Your issue has been deleted.",
-            icon: "success"
-          });
-          toast.success("Issue deleted successfully!");
-          navigate("/"); // ✅ redirect after delete
-        } else {
-          Swal.fire({
-            title: "Not Authorized",
-            text: "You cannot delete this issue.",
-            icon: "error"
-          });
-          toast.error("You are not authorized to delete this issue!");
-        }
-      } catch (err) {
-        Swal.fire({
-          title: "Error!",
-          text: "Failed to delete issue.",
-          icon: "error"
-        });
-        toast.error("Failed to delete issue");
-      }
-    }
+  // ✅ useForm setup
+  const { register, handleSubmit, reset } = useForm({
+    defaultValues: {
+      title: issue?.title || "",
+      description: issue?.description || "",
+      category: issue?.category || "",
+    },
   });
-};
+
+  const onSubmit = async (data) => {
+    try {
+      const res = await axiosSecure.patch(
+        `${import.meta.env.VITE_API_URL}/reports/${id}`,
+        data
+      );
+      if (res.data.modifiedCount > 0) {
+        toast.success("Issue updated successfully!");
+        setShowModal(false);
+        refetch();
+      }
+    } catch (err) {
+      toast.error("Failed to update issue");
+    }
+  };
+
+  //!note: delete----------------------------------------------
+  const handleDelete = async () => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const res = await axiosSecure.delete(
+            `${import.meta.env.VITE_API_URL}/reports/${id}`
+          );
+
+          if (res.data.deletedCount > 0) {
+            Swal.fire({
+              title: "Deleted!",
+              text: "Your issue has been deleted.",
+              icon: "success",
+            });
+            toast.success("Issue deleted successfully!");
+            navigate("/"); // ✅ redirect after delete
+          } else {
+            Swal.fire({
+              title: "Not Authorized",
+              text: "You cannot delete this issue.",
+              icon: "error",
+            });
+            toast.error("You are not authorized to delete this issue!");
+          }
+        } catch (err) {
+          Swal.fire({
+            title: "Error!",
+            text: "Failed to delete issue.",
+            icon: "error",
+          });
+          toast.error("Failed to delete issue");
+        }
+      }
+    });
+  };
+
   if (isLoading) return <LoadingSpinner />;
   if (isError) return <p className="text-red-500">Failed to load issue</p>;
 
@@ -148,7 +178,17 @@ const handleDelete = async () => {
             <div className="mt-6">
               <div className="flex gap-4 mb-4">
                 {canEdit && (
-                  <button className="flex items-center gap-2 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">
+                  <button
+                    onClick={() => {
+                      reset({
+                        title: issue.title,
+                        description: issue.description,
+                        category: issue.category,
+                      });
+                      setShowModal(true);
+                    }}
+                    className="flex items-center gap-2 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+                  >
                     <FaEdit /> Edit
                   </button>
                 )}
@@ -181,7 +221,48 @@ const handleDelete = async () => {
             </p>
           </div>
         )}
-        {/* Staff Info */}
+        {showModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+            <div className="bg-white rounded-lg p-6 w-96 shadow-lg">
+              <h2 className="text-xl font-bold mb-4">Edit Issue</h2>
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <input
+                  {...register("title")}
+                  className="w-full border rounded px-3 py-2"
+                />
+                <textarea
+                  {...register("description")}
+                  className="w-full border rounded px-3 py-2"
+                />
+                <select
+                  {...register("category")}
+                  className="w-full border rounded px-3 py-2"
+                >
+                  <option value="Streetlight">Streetlight</option>
+                  <option value="Road">Road</option>
+                  <option value="Garbage">Garbage</option>
+                  <option value="Water">Water</option>
+                </select>
+                <div className="flex justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowModal(false)}
+                    className="px-3 py-1 bg-gray-300 rounded hover:bg-gray-400"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
+                  >
+                    Save Changes
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
         {/* Staff Info */}
 
         <div className="bg-gray-100 rounded-lg p-6 mt-8">

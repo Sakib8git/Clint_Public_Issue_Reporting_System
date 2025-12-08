@@ -2,7 +2,9 @@ import React, { useState } from "react";
 import { Link } from "react-router";
 import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
 import { useQuery } from "@tanstack/react-query";
-
+import Swal from "sweetalert2";
+import { toast } from "react-hot-toast";
+import { useNavigate } from "react-router";
 
 import useAxiosSecure from "../../../../hooks/useAxiosSecure";
 import LoadingSpinner from "../../../../components/Shared/LoadingSpinner";
@@ -12,6 +14,7 @@ const MyIssues = () => {
   const [filterCategory, setFilterCategory] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [selectedIssue, setSelectedIssue] = useState(null);
+  const navigate = useNavigate();
 
   const axiosSecure = useAxiosSecure();
 
@@ -20,6 +23,7 @@ const MyIssues = () => {
     data: issues = [],
     isLoading,
     isError,
+    refetch,
   } = useQuery({
     queryKey: ["my-issues"],
     queryFn: async () => {
@@ -30,6 +34,67 @@ const MyIssues = () => {
       return res.data;
     },
   });
+  // edit
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const updatedIssue = {
+      title: form.title.value,
+      description: form.description.value,
+      category: form.category.value,
+    };
+
+    try {
+      const res = await axiosSecure.patch(
+        `${import.meta.env.VITE_API_URL}/reports/${selectedIssue._id}`,
+        updatedIssue
+      );
+      if (res.data.modifiedCount > 0) {
+        toast.success("Issue updated successfully!");
+        setShowModal(false);
+        refetch();
+      }
+    } catch (err) {
+      toast.error("Failed to update issue");
+    }
+  };
+  // delete
+  const handleDelete = async (id) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const res = await axiosSecure.delete(
+            `${import.meta.env.VITE_API_URL}/reports/${id}`
+          );
+
+          if (res.data.deletedCount > 0) {
+            Swal.fire("Deleted!", "Your issue has been deleted.", "success");
+            toast.success("Issue deleted successfully!");
+            refetch();
+            navigate("/dashboard/my-issues"); // redirect or refetch
+          } else {
+            Swal.fire(
+              "Not Authorized",
+              "You cannot delete this issue.",
+              "error"
+            );
+            toast.error("You are not authorized to delete this issue!");
+          }
+        } catch (err) {
+          Swal.fire("Error!", "Failed to delete issue.", "error");
+          toast.error("Failed to delete issue");
+        }
+      }
+    });
+  };
 
   if (isLoading) return <LoadingSpinner />;
   if (isError) return <p className="text-red-500">Failed to load issues</p>;
@@ -116,7 +181,10 @@ const MyIssues = () => {
                   <FaEdit /> Edit
                 </button>
               )}
-              <button className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 flex items-center gap-1">
+              <button
+                onClick={() => handleDelete(issue._id)}
+                className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 flex items-center gap-1"
+              >
                 <FaTrash /> Delete
               </button>
               <Link
@@ -135,23 +203,27 @@ const MyIssues = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
           <div className="bg-white rounded-lg p-6 w-96 shadow-lg">
             <h2 className="text-xl font-bold mb-4">Edit Issue</h2>
-            <form className="space-y-4">
+            <form onSubmit={handleUpdate} className="space-y-4">
               <input
                 type="text"
+                name="title"
                 defaultValue={selectedIssue.title}
                 className="w-full border rounded px-3 py-2"
               />
               <textarea
+                name="description"
                 defaultValue={selectedIssue.description}
                 className="w-full border rounded px-3 py-2"
               />
               <select
+                name="category"
                 defaultValue={selectedIssue.category}
                 className="w-full border rounded px-3 py-2"
               >
                 <option value="Streetlight">Streetlight</option>
                 <option value="Road">Road</option>
                 <option value="Garbage">Garbage</option>
+                <option value="Garbage">Water</option>
               </select>
               <div className="flex justify-end gap-2">
                 <button
