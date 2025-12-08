@@ -10,6 +10,7 @@ import Container from "../../components/Shared/Container";
 import StatisticsSection from "../../components/Home/StatisticsSection";
 import TestimonialsSection from "../../components/Home/TestimonialsSection";
 
+
 const Home = () => {
   const navigate = useNavigate();
 
