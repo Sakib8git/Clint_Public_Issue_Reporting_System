@@ -4,8 +4,14 @@ import toast from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
 import useAxiosSecure from "../../../../hooks/useAxiosSecure";
 import StaffModal from "../../../../components/Modal/StaffModal";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  updateProfile,
+} from "firebase/auth";
 
 const ManageStaff = () => {
+  const auth = getAuth();
   const axiosSecure = useAxiosSecure();
   const [showAddModal, setShowAddModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
@@ -35,17 +41,47 @@ const ManageStaff = () => {
 
   if (isLoading) return <p>Loading staff...</p>;
 
-  // ✅ Add Staff
+  //Add Staff
   const handleAddStaff = async () => {
     try {
-      if (!formData.name || !formData.email || !formData.phone) {
+      if (
+        !formData.name ||
+        !formData.email ||
+        !formData.phone ||
+        !formData.password
+      ) {
         toast.error("Please fill all required fields");
         return;
       }
+
+      // 1️⃣ Firebase Auth user create
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        formData.email,
+        formData.password
+      );
+
+      // 2️⃣ Profile update
+      await updateProfile(userCredential.user, {
+        displayName: formData.name,
+        photoURL: formData.photo,
+      });
+
+      // 3️⃣ Save in DB
+      const staffData = {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        photo: formData.photo,
+        role: "staff",
+        createdAt: new Date(),
+      };
+
       const res = await axiosSecure.post(
         `${import.meta.env.VITE_API_URL}/staff`,
-        formData
+        staffData
       );
+
       if (res.data.insertedId) {
         toast.success("Staff added successfully!");
         refetch();
@@ -60,11 +96,12 @@ const ManageStaff = () => {
         });
       }
     } catch (err) {
-      toast.error("Failed to add staff");
+      console.error("Add staff error:", err);
+      toast.error(err?.message || "Failed to add staff");
     }
   };
 
-  // ✅ Update Staff (only name + phone)
+  // Update Staff
   const handleUpdateStaff = async () => {
     try {
       if (!formData._id) {
@@ -89,7 +126,7 @@ const ManageStaff = () => {
     }
   };
 
-  // ✅ Delete Staff
+  // Delete Staff
   const handleDeleteStaff = (id) => {
     Swal.fire({
       title: "Are you sure?",

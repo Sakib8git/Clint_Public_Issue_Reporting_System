@@ -1,33 +1,26 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import toast from "react-hot-toast";
-
-const dummyUsers = [
-  {
-    id: "USER001",
-    name: "Nazmus Sakib",
-    email: "nazmus@example.com",
-    subscription: "free",
-    status: "active",
-  },
-  {
-    id: "USER002",
-    name: "Rahim Uddin",
-    email: "rahim@example.com",
-    subscription: "premium",
-    status: "blocked",
-  },
-  {
-    id: "USER003",
-    name: "Karim Ali",
-    email: "karim@example.com",
-    subscription: "free",
-    status: "active",
-  },
-];
+import useAxiosSecure from "../../../../hooks/useAxiosSecure";
 
 const ManageUsers = () => {
-  const [users, setUsers] = useState(dummyUsers);
+  const axiosSecure = useAxiosSecure();
+  const [users, setUsers] = useState([]);
+
+  // ✅ Fetch users from backend (citizen collection)
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const res = await axiosSecure.get(
+          `${import.meta.env.VITE_API_URL}/citizen`
+        );
+        setUsers(res.data);
+      } catch (err) {
+        toast.error("Failed to load users");
+      }
+    };
+    fetchUsers();
+  }, [axiosSecure]);
 
   const handleBlockToggle = (userId, currentStatus) => {
     const action = currentStatus === "blocked" ? "unblock" : "block";
@@ -43,7 +36,7 @@ const ManageUsers = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         const updated = users.map((user) =>
-          user.id === userId
+          user._id === userId
             ? { ...user, status: action === "block" ? "blocked" : "active" }
             : user
         );
@@ -71,7 +64,7 @@ const ManageUsers = () => {
             <th className="p-2">ID</th>
             <th className="p-2">Name</th>
             <th className="p-2">Email</th>
-            <th className="p-2">Subscription</th>
+            <th className="p-2">Role</th>
             <th className="p-2">Status</th>
             <th className="p-2">Action</th>
           </tr>
@@ -79,17 +72,19 @@ const ManageUsers = () => {
         <tbody>
           {users.map((user) => (
             <tr
-              key={user.id}
+              key={user._id}
               className={user.status === "blocked" ? "bg-red-50" : ""}
             >
-              <td className="p-2">{user.id}</td>
+              <td className="p-2">{user._id}</td>
               <td className="p-2">{user.name}</td>
               <td className="p-2">{user.email}</td>
-              <td className="p-2 capitalize">{user.subscription}</td>
-              <td className="p-2 capitalize">{user.status}</td>
+              <td className="p-2 capitalize">{user.role}</td>
+              <td className="p-2 capitalize">{user.status || "active"}</td>
               <td className="p-2">
                 <button
-                  onClick={() => handleBlockToggle(user.id, user.status)}
+                  onClick={() =>
+                    handleBlockToggle(user._id, user.status || "active")
+                  }
                   className={`px-3 py-1 rounded text-white ${
                     user.status === "blocked"
                       ? "bg-green-500 hover:bg-green-700"

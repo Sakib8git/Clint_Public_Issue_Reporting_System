@@ -213,7 +213,7 @@ const IssueDetails = () => {
             </div>
           </div>
         </div>
-        {issue.reporter && (
+        {/* {issue.reporter && (
           <div className="bg-white shadow rounded-lg p-6 mt-8">
             <h2 className="text-xl font-bold mb-2">Reported By</h2>
             <p>
@@ -238,7 +238,7 @@ const IssueDetails = () => {
               </p>
             )}
           </div>
-        )}
+        )} */}
         {showModal && (
           <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center">
             <div className="bg-white rounded-lg p-6 w-96 shadow-lg">

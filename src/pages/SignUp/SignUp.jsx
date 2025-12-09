@@ -18,24 +18,24 @@ const SignUp = () => {
     formState: { errors },
   } = useForm();
   // useForm handeler
-  const onSubmit = async (data) => {
-    const { name, image, email, password } = data;
-    const imageFile = image[0];
-    try {
-      const imageURL = await imageUplode(imageFile);
-      const result = await createUser(email, password);
-      // await saveOrUpdateUser({ name, email, image: imageURL });
-      await updateUserProfile(name, imageURL);
-      // navigate(from, { replace: true });
-      toast.success("Signup Successful");
-      navigate("/login");
-      logOut();
-      console.log(result);
-    } catch (err) {
-      console.log(err);
-      toast.error(err?.message);
-    }
-  };
+  // const onSubmit = async (data) => {
+  //   const { name, image, email, password } = data;
+  //   const imageFile = image[0];
+  //   try {
+  //     const imageURL = await imageUplode(imageFile);
+  //     const result = await createUser(email, password);
+  //     // await saveOrUpdateUser({ name, email, image: imageURL });
+  //     await updateUserProfile(name, imageURL);
+  //     // navigate(from, { replace: true });
+  //     toast.success("Signup Successful");
+  //     navigate("/login");
+  //     logOut();
+  //     console.log(result);
+  //   } catch (err) {
+  //     console.log(err);
+  //     toast.error(err?.message);
+  //   }
+  // };
   // form submit handler
   // const handleSubmit = async (event) => {
   //   event.preventDefault();
@@ -76,6 +76,39 @@ const SignUp = () => {
   //     toast.error(err?.message)
   //   }
   // }
+  const onSubmit = async (data) => {
+    const { name, image, email, password } = data;
+    const imageFile = image[0];
+    try {
+      const imageURL = await imageUplode(imageFile);
+      const result = await createUser(email, password);
+
+      await updateUserProfile(name, imageURL);
+
+      // ✅ Save citizen in DB
+      const citizenData = {
+        name,
+        email,
+        image: imageURL,
+        role: "citizen",
+        createdAt: new Date(),
+      };
+
+      await fetch(`${import.meta.env.VITE_API_URL}/citizen`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(citizenData),
+      });
+
+      toast.success("Signup Successful");
+      navigate("/login");
+      logOut();
+      console.log(result);
+    } catch (err) {
+      console.log(err);
+      toast.error(err?.message);
+    }
+  };
   return (
     <div className="flex justify-center items-center min-h-screen bg-white">
       <div className="flex flex-col max-w-md p-6 rounded-md sm:p-10 bg-gray-100 text-gray-900">
