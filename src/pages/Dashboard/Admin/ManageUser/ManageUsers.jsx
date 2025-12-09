@@ -66,9 +66,9 @@ const ManageUsers = () => {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Manage Users</h1>
+      <h1 className="text-2xl font-bold mb-4">Manage Citizen</h1>
 
-      <table className="w-full border text-left">
+      <table className="w-full  text-left">
         <thead>
           <tr className="bg-gray-100">
             <th className="p-2">ID</th>
@@ -80,42 +80,42 @@ const ManageUsers = () => {
           </tr>
         </thead>
         <tbody>
-          {users.map((user) => (
-            <tr
-              key={user._id}
-              className={user.status === "blocked" ? "bg-red-50" : ""}
-            >
-              <td className="p-2">{user._id}</td>
-              <td className="p-2">{user.name}</td>
-              <td className="p-2">{user.email}</td>
-              <td className="p-2 capitalize">{user.role}</td>
-              <td className="p-2 capitalize flex items-center gap-2">
-                {/* status text */}
-                {user.status === "premium" ? (
-                  <span className="px-2 py-1 text-xs font-semibold bg-yellow-400 text-white rounded-full">
-                    Premium
-                  </span>
-                ) : (
-                  user.status || "active"
-                )}
-              </td>
-
-              <td className="p-2">
-                <button
-                  onClick={() =>
-                    handleBlockToggle(user._id, user.action || "unblock")
-                  }
-                  className={`px-3 py-1 rounded text-white ${
-                    user.action === "block"
-                      ? "bg-green-500 hover:bg-green-700"
-                      : "bg-red-500 hover:bg-red-700"
-                  }`}
-                >
-                  {user.action === "block" ? "Unblock" : "Block"}
-                </button>
-              </td>
-            </tr>
-          ))}
+          {users
+            .filter((user) => user.role === "citizen") // ✅ only citizens
+            .map((user) => (
+              <tr
+                key={user._id}
+                className={user.status === "blocked" ? "bg-red-50" : ""}
+              >
+                <td className="p-2">{user._id}</td>
+                <td className="p-2">{user.name}</td>
+                <td className="p-2">{user.email}</td>
+                <td className="p-2 capitalize">{user.role}</td>
+                <td className="p-2 capitalize flex items-center gap-2">
+                  {user.status === "premium" ? (
+                    <span className="px-2 py-1 text-xs font-semibold bg-yellow-400 text-white rounded-full">
+                      Premium
+                    </span>
+                  ) : (
+                    user.status || "active"
+                  )}
+                </td>
+                <td className="p-2">
+                  <button
+                    onClick={() =>
+                      handleBlockToggle(user._id, user.action || "unblock")
+                    }
+                    className={`px-3 py-1 rounded text-white ${
+                      user.action === "block"
+                        ? "bg-green-500 hover:bg-green-700"
+                        : "bg-red-500 hover:bg-red-700"
+                    }`}
+                  >
+                    {user.action === "block" ? "Unblock" : "Block"}
+                  </button>
+                </td>
+              </tr>
+            ))}
         </tbody>
       </table>
     </div>

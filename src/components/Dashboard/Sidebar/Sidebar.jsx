@@ -10,10 +10,17 @@ import { FaListAlt, FaBolt, FaUserShield, FaUsersCog } from "react-icons/fa";
 import { CgProfile } from "react-icons/cg";
 import { GrUserWorker } from "react-icons/gr";
 import { MdOutlinePayment } from "react-icons/md";
+import AdminMenu from "./Menu/AdminMenu";
+import useRole from "../../../hooks/useRoll";
+import StaffMenu from "./Menu/StaffMenu";
+import CitizenMenu from "./Menu/CitizenMenu";
 const Sidebar = () => {
   const { logOut } = useAuth();
   const location = useLocation();
   const [isActive, setActive] = useState(false);
+  const [role, isRoleLoading] = useRole();
+
+  if (isRoleLoading) return <p>Loading...</p>;
 
   const handleToggle = () => {
     setActive(!isActive);
@@ -77,107 +84,14 @@ const Sidebar = () => {
             <BsGraphUp className="w-5 h-5" />
           </Link>
           {/* note:cityzen */}
-          <Link
-            to="/dashboard/my-issues"
-            className={`p-3 rounded-lg hover:bg-white hover:text-green-600 transition ${isActiveLink(
-              "/dashboard/issues"
-            )}`}
-            title="My Issues"
-          >
-            <FaListAlt className="w-5 h-5" />
-          </Link>
-
-          <Link
-            to="/dashboard/report-issue"
-            className={`p-3 rounded-lg hover:bg-white hover:text-green-600 transition ${isActiveLink(
-              "/dashboard/report"
-            )}`}
-            title="Report Issue"
-          >
-            <FaBolt className="w-5 h-5" />
-          </Link>
-          {/* profile- citizen------ */}
-          <Link
-            to="/dashboard/cityzen-profile"
-            className={`p-3 rounded-lg hover:bg-white hover:text-green-600 transition ${isActiveLink(
-              "/dashboard/report"
-            )}`}
-            title="Profile"
-          >
-            <CgProfile className="w-5 h-5" />
-          </Link>
+          {role === "citizen" && <CitizenMenu />}
 
           {/* note:staff */}
           {/* profile- staff------ */}
-          <Link
-            to="/dashboard/staff-profile"
-            className={`p-3 rounded-lg hover:bg-white hover:text-green-600 transition ${isActiveLink(
-              "/dashboard/report"
-            )}`}
-            title="Profile"
-          >
-            <GrUserWorker className="w-5 h-5" />
-          </Link>
+          {role === "staff" && <StaffMenu />}
 
-          <Link
-            to="/dashboard/assigned-issues"
-            className={`p-3 rounded-lg hover:bg-white hover:text-green-600 transition ${isActiveLink(
-              "/dashboard/assign-issues"
-            )}`}
-            title="Assign Issues"
-          >
-            <FaUserShield className="w-5 h-5" />
-          </Link>
           {/* note:Admin */}
-          <Link
-            to="/dashboard/admin-issues"
-            className={`p-3 rounded-lg hover:bg-white hover:text-green-600 transition ${isActiveLink(
-              "/dashboard/all-issues"
-            )}`}
-            title="All Issues"
-          >
-            <FaListAlt className="w-5 h-5" />
-          </Link>
-
-          <Link
-            to="/dashboard/manage-users"
-            className={`p-3 rounded-lg hover:bg-white hover:text-green-600 transition ${isActiveLink(
-              "/dashboard/manage-users"
-            )}`}
-            title="Manage Users"
-          >
-            <FaUsersCog className="w-5 h-5" />
-          </Link>
-
-          <Link
-            to="/dashboard/manage-staff"
-            className={`p-3 rounded-lg hover:bg-white hover:text-green-600 transition ${isActiveLink(
-              "/dashboard/manage-staff"
-            )}`}
-            title="Manage Staff"
-          >
-            <FaUserShield className="w-5 h-5" />
-          </Link>
-
-          <Link
-            to="/dashboard/payments"
-            className={`p-3 rounded-lg hover:bg-white hover:text-green-600 transition ${isActiveLink(
-              "/dashboard/payments"
-            )}`}
-            title="Payments"
-          >
-            <MdOutlinePayment className="w-5 h-5" />
-          </Link>
-
-          <Link
-            to="/dashboard/profile"
-            className={`p-3 rounded-lg hover:bg-white hover:text-green-600 transition ${isActiveLink(
-              "/dashboard/profile"
-            )}`}
-            title="Profile"
-          >
-            <FcSettings className="w-5 h-5" />
-          </Link>
+          {role === "admin" && <AdminMenu />}
         </div>
 
         {/* Logout */}
