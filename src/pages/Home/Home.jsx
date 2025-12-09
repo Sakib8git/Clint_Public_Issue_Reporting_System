@@ -1,7 +1,9 @@
+"use client";
+
 import { useNavigate } from "react-router";
+import { motion } from "framer-motion"; // ✅ motion import
 import Banner from "../../components/Home/Banner";
 import FeaturesSection from "../../components/Home/FeaturesSection";
-
 import HowItWorksSection from "../../components/Home/HowItWorksSection";
 import LatestResolvedIssues from "../../components/Home/LatestResolvedIssues";
 import Plants from "../../components/Home/Plants";
@@ -10,6 +12,10 @@ import Container from "../../components/Shared/Container";
 import StatisticsSection from "../../components/Home/StatisticsSection";
 import TestimonialsSection from "../../components/Home/TestimonialsSection";
 
+const fadeUp = {
+  hidden: { opacity: 0, y: 50 }, // niche theke
+  visible: { opacity: 1, y: 0 },
+};
 
 const Home = () => {
   const navigate = useNavigate();
@@ -17,16 +23,69 @@ const Home = () => {
   return (
     <div>
       <Container>
-        <Banner></Banner>
-        <LatestResolvedIssues></LatestResolvedIssues>
-        <div className="text-center">
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={fadeUp}
+          transition={{ duration: 0.8 }}
+        >
+          <Banner />
+        </motion.div>
+
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={fadeUp}
+          transition={{ duration: 1 }}
+        >
+          <LatestResolvedIssues />
+        </motion.div>
+
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={fadeUp}
+          transition={{ duration: 1.2 }}
+          className="text-center"
+        >
           <Button label="All Reports" onClick={() => navigate("/all-issues")} />
-        </div>
-        <FeaturesSection></FeaturesSection>
-        <HowItWorksSection></HowItWorksSection>
-        <StatisticsSection></StatisticsSection>
-        <TestimonialsSection></TestimonialsSection>
-        {/* More components */}
+        </motion.div>
+
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={fadeUp}
+          transition={{ duration: 1.4 }}
+        >
+          <FeaturesSection />
+        </motion.div>
+
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={fadeUp}
+          transition={{ duration: 1.6 }}
+        >
+          <HowItWorksSection />
+        </motion.div>
+
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={fadeUp}
+          transition={{ duration: 1.8 }}
+        >
+          <StatisticsSection />
+        </motion.div>
+
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={fadeUp}
+          transition={{ duration: 2 }}
+        >
+          <TestimonialsSection />
+        </motion.div>
       </Container>
       {/* <Plants /> */}
     </div>

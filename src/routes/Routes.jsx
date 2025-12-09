@@ -23,6 +23,7 @@ import AdminIssues from "../pages/Dashboard/Admin/AllIssues/AdminIssues";
 import ManageStaff from "../pages/Dashboard/Admin/ManageStaff/ManageStaff";
 import Payments from "../pages/Dashboard/Admin/Payments/Payments";
 import About from "../pages/IssueDetails/About/About";
+import Feedback from "../pages/Home/Feedback/Feedback";
 
 export const router = createBrowserRouter([
   {
@@ -41,6 +42,10 @@ export const router = createBrowserRouter([
       {
         path: "about",
         element: <About />,
+      },
+      {
+        path: "feedback",
+        element: <Feedback />,
       },
       {
         path: "/issue-details/:id",

@@ -42,6 +42,13 @@ const Navbar = () => {
               >
                 About
               </Link>
+              {/* About link - hidden on small screens */}
+              <Link
+                to="/feedback"
+                className="hidden md:block text-sm font-semibold hover:text-blue-500 transition"
+              >
+                Feedback
+              </Link>
             </div>
 
             {/* Dropdown Menu */}

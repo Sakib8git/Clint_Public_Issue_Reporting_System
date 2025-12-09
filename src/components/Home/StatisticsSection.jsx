@@ -1,39 +1,97 @@
-import React from "react";
+"use client";
+
+import React, { useEffect } from "react";
 import {
   FaClipboardList,
   FaCheckCircle,
   FaUsers,
   FaUserShield,
 } from "react-icons/fa";
+import { useQuery } from "@tanstack/react-query";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
+import { animate, motion, useMotionValue, useTransform } from "motion/react";
 
-const stats = [
-  {
-    id: 1,
-    icon: <FaClipboardList className="text-green-600 text-4xl" />,
-    value: "1200+",
-    label: "Total Issues Reported",
-  },
-  {
-    id: 2,
-    icon: <FaCheckCircle className="text-green-600 text-4xl" />,
-    value: "950+",
-    label: "Issues Resolved",
-  },
-  {
-    id: 3,
-    icon: <FaUsers className="text-green-600 text-4xl" />,
-    value: "500+",
-    label: "Active Citizens",
-  },
-  {
-    id: 4,
-    icon: <FaUserShield className="text-green-600 text-4xl" />,
-    value: "50+",
-    label: "Staff Members",
-  },
-];
+const AnimatedNumber = ({ target }) => {
+  const count = useMotionValue(0);
+  const rounded = useTransform(count, (latest) => Math.round(latest));
+
+  useEffect(() => {
+    const controls = animate(count, target, { duration: 2 });
+    return () => controls.stop();
+  }, [target, count]);
+
+  return (
+    <motion.span className="text-3xl font-extrabold text-black">
+      {rounded}
+    </motion.span>
+  );
+};
 
 const StatisticsSection = () => {
+  const axiosSecure = useAxiosSecure();
+
+  // ✅ Fetch reports, citizens, staff
+  const { data: reports = [], isLoading: loadingReports } = useQuery({
+    queryKey: ["reports"],
+    queryFn: async () => {
+      const res = await axiosSecure.get(
+        `${import.meta.env.VITE_API_URL}/reports`
+      );
+      return res.data;
+    },
+  });
+
+  const { data: citizens = [], isLoading: loadingCitizens } = useQuery({
+    queryKey: ["citizens"],
+    queryFn: async () => {
+      const res = await axiosSecure.get(
+        `${import.meta.env.VITE_API_URL}/citizen`
+      );
+      return res.data;
+    },
+  });
+
+  const { data: staff = [], isLoading: loadingStaff } = useQuery({
+    queryKey: ["staff"],
+    queryFn: async () => {
+      const res = await axiosSecure.get(
+        `${import.meta.env.VITE_API_URL}/staff`
+      );
+      return res.data;
+    },
+  });
+
+  if (loadingReports || loadingCitizens || loadingStaff) {
+    return <p className="text-center py-10">Loading statistics...</p>;
+  }
+
+  const stats = [
+    {
+      id: 1,
+      icon: <FaClipboardList className="text-green-600 text-4xl" />,
+      value: reports.length,
+      label: "Total Issues Reported",
+    },
+    {
+      id: 2,
+      icon: <FaCheckCircle className="text-green-600 text-4xl" />,
+      value: reports.filter((r) => r.status === "resolved").length,
+      label: "Issues Resolved",
+    },
+    {
+      id: 3,
+      icon: <FaUsers className="text-green-600 text-4xl" />,
+      value: citizens.length,
+      label: "Active Citizens",
+    },
+    {
+      id: 4,
+      icon: <FaUserShield className="text-green-600 text-4xl" />,
+      value: staff.length,
+      label: "Staff Members",
+    },
+  ];
+
   return (
     <div className="bg-gray-100 py-12">
       <div className="container mx-auto px-4">
@@ -48,9 +106,9 @@ const StatisticsSection = () => {
               className="flex flex-col items-center p-6 bg-white rounded-lg shadow hover:shadow-lg transition"
             >
               {stat.icon}
-              <h3 className="mt-4 text-3xl font-extrabold text-black">
-                {stat.value}
-              </h3>
+              <div className="mt-4">
+                <AnimatedNumber target={stat.value} />
+              </div>
               <p className="mt-2 text-gray-600 text-sm">{stat.label}</p>
             </div>
           ))}

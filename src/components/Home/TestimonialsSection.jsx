@@ -1,31 +1,23 @@
 import React from "react";
-import { FaStar } from "react-icons/fa";
+import { useQuery } from "@tanstack/react-query";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
-const testimonials = [
-  {
-    id: 1,
-    name: "Rahim Uddin",
-    feedback: "Streetlight fixed within 2 days! Very responsive system.",
-    rating: 5,
-    avatar: "https://via.placeholder.com/80?text=R",
-  },
-  {
-    id: 2,
-    name: "Karim Ali",
-    feedback: "Garbage cleaned quickly, thanks to the staff team.",
-    rating: 4,
-    avatar: "https://via.placeholder.com/80?text=K",
-  },
-  {
-    id: 3,
-    name: "Fatema Begum",
-    feedback: "Water leakage issue resolved smoothly. Great initiative!",
-    rating: 5,
-    avatar: "https://via.placeholder.com/80?text=F",
-  },
-];
 
 const TestimonialsSection = () => {
+  const axiosSecure = useAxiosSecure();
+
+  // ✅ Fetch comments from backend
+  const { data: comments = [], isLoading, isError } = useQuery({
+    queryKey: ["comments"],
+    queryFn: async () => {
+      const res = await axiosSecure.get("/comments");
+      return res.data;
+    },
+  });
+
+  if (isLoading) return <p className="text-center py-10">Loading comments...</p>;
+  if (isError) return <p className="text-center py-10 text-red-500">Failed to load comments</p>;
+
   return (
     <div className="bg-gray-50 py-12">
       <div className="container mx-auto px-4">
@@ -34,25 +26,23 @@ const TestimonialsSection = () => {
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {testimonials.map((t) => (
+          {comments.map((c) => (
             <div
-              key={t.id}
+              key={c._id}
               className="p-6 bg-white rounded-lg shadow hover:shadow-lg transition flex flex-col items-center text-center"
             >
               <img
-                src={t.avatar}
-                alt={t.name}
+                src={c.avatar || "https://via.placeholder.com/80?text=U"}
+                alt={c.name}
                 className="w-20 h-20 rounded-full mb-4 border-2 border-green-500"
               />
-              <h3 className="text-lg font-semibold">{t.name}</h3>
+              <h3 className="text-lg font-semibold">{c.name}</h3>
               <p className="mt-2 text-gray-600 text-sm italic">
-                "{t.feedback}"
+                "{c.comment}"
               </p>
-              <div className="flex mt-3 text-yellow-400">
-                {Array.from({ length: t.rating }).map((_, i) => (
-                  <FaStar key={i} />
-                ))}
-              </div>
+              <p className="mt-3 text-xs text-gray-500">
+                {c.createdAt ? new Date(c.createdAt).toLocaleDateString("en-GB") : "N/A"}
+              </p>
             </div>
           ))}
         </div>
