@@ -2,15 +2,48 @@ import { useState } from "react";
 import useAuth from "../../../hooks/useAuth";
 import coverImg from "../../../assets/images/cover.jpg";
 import ProfileModal from "../../../components/Modal/ProfileModal";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
+import toast from "react-hot-toast";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 const Profile = () => {
   const { user } = useAuth();
+  const axiosSecure = useAxiosSecure();
+  const queryClient = useQueryClient();
   const [showUpdateModal, setShowUpdateModal] = useState(false);
 
-  const handleUpdateProfile = (data) => {
-    console.log("Updated profile:", data);
-    // TODO: connect with Firebase updateProfile or backend API
-  };
+  // ✅ Fetch profile with useQuery
+  const { data: profile, isLoading } = useQuery({
+    queryKey: ["userProfile", user?.email],
+    enabled: !!user?.email,
+    queryFn: async () => {
+      const { data } = await axiosSecure.get(`/user/${user.email}`);
+      return data;
+    },
+  });
+
+  // ✅ Update profile with useMutation
+  const { mutate: updateProfile } = useMutation({
+    mutationFn: async (data) => {
+      const res = await axiosSecure.patch(`/user/${user.email}`, data);
+      return res.data;
+    },
+    onSuccess: (res) => {
+      if (res.modifiedCount > 0) {
+        toast.success("Profile updated successfully!");
+        setShowUpdateModal(false);
+        // ✅ refresh cached profile
+        queryClient.invalidateQueries(["userProfile", user.email]);
+      } else {
+        toast.error("No changes detected.");
+      }
+    },
+    onError: () => {
+      toast.error("Failed to update profile.");
+    },
+  });
+
+  if (isLoading) return <p>Loading...</p>;
 
   return (
     <div className="flex justify-center items-center h-screen">
@@ -23,7 +56,7 @@ const Profile = () => {
         <div className="flex flex-col items-center justify-center p-4 -mt-16">
           <img
             alt="profile"
-            src={user?.photoURL}
+            src={profile?.image || user?.photoURL}
             className="mx-auto object-cover rounded-full h-24 w-24 border-2 border-white"
           />
 
@@ -39,7 +72,7 @@ const Profile = () => {
               <p className="flex flex-col">
                 Name
                 <span className="font-bold text-gray-600">
-                  {user?.displayName}
+                  {profile?.name || user?.displayName}
                 </span>
               </p>
               <p className="flex flex-col">
@@ -65,10 +98,10 @@ const Profile = () => {
         isOpen={showUpdateModal}
         close={() => setShowUpdateModal(false)}
         initialData={{
-          displayName: user?.displayName,
-          photoURL: user?.photoURL,
+          displayName: profile?.name || user?.displayName,
+          photoURL: profile?.image || user?.photoURL,
         }}
-        onConfirm={handleUpdateProfile}
+        onConfirm={(data) => updateProfile(data)}
       />
     </div>
   );

@@ -24,6 +24,7 @@ import ManageStaff from "../pages/Dashboard/Admin/ManageStaff/ManageStaff";
 import Payments from "../pages/Dashboard/Admin/Payments/Payments";
 import About from "../pages/IssueDetails/About/About";
 import Feedback from "../pages/Home/Feedback/Feedback";
+import UpdateProfile from "../pages/IssueDetails/UpdateProfile/UpdateProfile";
 
 export const router = createBrowserRouter([
   {
@@ -105,6 +106,14 @@ export const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <CitizenProfile />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "update-profile",
+        element: (
+          <PrivateRoute>
+            <UpdateProfile />
           </PrivateRoute>
         ),
       },
