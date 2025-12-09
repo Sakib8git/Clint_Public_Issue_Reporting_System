@@ -4,12 +4,13 @@ import LoadingSpinner from "../../components/Shared/LoadingSpinner";
 import useAuth from "../../hooks/useAuth";
 import { FcGoogle } from "react-icons/fc";
 import { TbFidgetSpinner } from "react-icons/tb";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 const Login = () => {
   const { signIn, signInWithGoogle, loading, user, setLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-
+  const axiosSecure = useAxiosSecure();
   const from = location.state || "/";
 
   if (loading) return <LoadingSpinner />;
@@ -35,10 +36,34 @@ const Login = () => {
   };
 
   // Handle Google Signin
+  // const handleGoogleSignIn = async () => {
+  //   try {
+  //     //User Registration using google
+  //     await signInWithGoogle();
+  //     navigate(from, { replace: true });
+  //     toast.success("Login Successful");
+  //   } catch (err) {
+  //     console.log(err);
+  //     setLoading(false);
+  //     toast.error(err?.message);
+  //   }
+  // };
   const handleGoogleSignIn = async () => {
     try {
-      //User Registration using google
-      await signInWithGoogle();
+      const result = await signInWithGoogle();
+
+      const citizenData = {
+        name: result.user.displayName,
+        email: result.user.email,
+        image: result.user.photoURL,
+        role: "citizen",
+        status: "normal",
+        action: "unblock",
+        createdAt: new Date(),
+      };
+
+      await axiosSecure.post("/citizen", citizenData);
+
       navigate(from, { replace: true });
       toast.success("Login Successful");
     } catch (err) {

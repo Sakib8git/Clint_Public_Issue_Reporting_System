@@ -22,34 +22,44 @@ const ManageUsers = () => {
     fetchUsers();
   }, [axiosSecure]);
 
-  const handleBlockToggle = (userId, currentStatus) => {
-    const action = currentStatus === "blocked" ? "unblock" : "block";
+  const handleBlockToggle = (userId, currentAction) => {
+    const newAction = currentAction === "block" ? "unblock" : "block";
 
     Swal.fire({
-      title: `Are you sure you want to ${action} this user?`,
+      title: `Are you sure you want to ${newAction} this user?`,
       text: "This action can be reverted later.",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
-      confirmButtonText: `Yes, ${action} it!`,
+      confirmButtonText: `Yes, ${newAction} it!`,
     }).then((result) => {
       if (result.isConfirmed) {
-        const updated = users.map((user) =>
-          user._id === userId
-            ? { ...user, status: action === "block" ? "blocked" : "active" }
-            : user
-        );
-        setUsers(updated);
+        // ✅ Patch request to backend
+        axiosSecure
+          .patch(`/citizen/${userId}`, { action: newAction })
+          .then((res) => {
+            if (res.data.modifiedCount > 0) {
+              // update local state
+              const updated = users.map((user) =>
+                user._id === userId ? { ...user, action: newAction } : user
+              );
+              setUsers(updated);
 
-        Swal.fire({
-          title: "Success!",
-          text: `User has been ${action}ed.`,
-          icon: "success",
-        });
+              Swal.fire({
+                title: "Success!",
+                text: `User has been ${newAction}ed.`,
+                icon: "success",
+              });
 
-        toast.success(`User ${userId} ${action}ed`);
-        console.log(`DB updated: ${userId} ${action}ed`);
+              toast.success(`User ${userId} ${newAction}ed`);
+              console.log(`DB updated: ${userId} ${newAction}ed`);
+            }
+          })
+          .catch((err) => {
+            console.error(err);
+            toast.error("Failed to update user in DB");
+          });
       }
     });
   };
@@ -79,19 +89,29 @@ const ManageUsers = () => {
               <td className="p-2">{user.name}</td>
               <td className="p-2">{user.email}</td>
               <td className="p-2 capitalize">{user.role}</td>
-              <td className="p-2 capitalize">{user.status || "active"}</td>
+              <td className="p-2 capitalize flex items-center gap-2">
+                {/* status text */}
+                {user.status === "premium" ? (
+                  <span className="px-2 py-1 text-xs font-semibold bg-yellow-400 text-white rounded-full">
+                    Premium
+                  </span>
+                ) : (
+                  user.status || "active"
+                )}
+              </td>
+
               <td className="p-2">
                 <button
                   onClick={() =>
-                    handleBlockToggle(user._id, user.status || "active")
+                    handleBlockToggle(user._id, user.action || "unblock")
                   }
                   className={`px-3 py-1 rounded text-white ${
-                    user.status === "blocked"
+                    user.action === "block"
                       ? "bg-green-500 hover:bg-green-700"
                       : "bg-red-500 hover:bg-red-700"
                   }`}
                 >
-                  {user.status === "blocked" ? "Unblock" : "Block"}
+                  {user.action === "block" ? "Unblock" : "Block"}
                 </button>
               </td>
             </tr>

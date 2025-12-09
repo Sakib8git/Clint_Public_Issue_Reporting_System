@@ -91,6 +91,8 @@ const SignUp = () => {
         email,
         image: imageURL,
         role: "citizen",
+        status: "normal",
+        action: "unblock",
         createdAt: new Date(),
       };
 

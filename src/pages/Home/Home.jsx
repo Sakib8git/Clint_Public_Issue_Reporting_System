@@ -1,7 +1,7 @@
-"use client";
+// "use client";
 
 import { useNavigate } from "react-router";
-import { motion } from "framer-motion"; // ✅ motion import
+import { motion } from "framer-motion";
 import Banner from "../../components/Home/Banner";
 import FeaturesSection from "../../components/Home/FeaturesSection";
 import HowItWorksSection from "../../components/Home/HowItWorksSection";
