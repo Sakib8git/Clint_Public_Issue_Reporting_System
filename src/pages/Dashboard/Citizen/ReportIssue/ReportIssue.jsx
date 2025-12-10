@@ -28,7 +28,7 @@ const ReportIssue = () => {
     enabled: !!user?.email,
   });
 
-  // ✅ Limit check
+  // Limit check
   const isLimitReached =
     citizenData?.role === "citizen" &&
     citizenData?.status === "normal" &&

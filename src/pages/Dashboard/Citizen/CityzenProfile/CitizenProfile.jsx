@@ -4,6 +4,8 @@ import coverImg from "../../../../assets/images/cover.jpg";
 import toast from "react-hot-toast";
 import { Link } from "react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import SubscribeModal from "../../../../components/Modal/SubscribeModal";
 
 const CitizenProfile = () => {
   const { user } = useAuth();
@@ -28,6 +30,9 @@ const CitizenProfile = () => {
 
   const isPremium = profile?.status === "premium";
   const isBlocked = profile?.action === "block";
+
+  // ✅ modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   if (isLoading) {
     return <p className="text-center mt-10">Loading profile...</p>;
@@ -89,12 +94,20 @@ const CitizenProfile = () => {
                 Update Profile
               </Link>
               {!isPremium && !isBlocked && (
-                <button
-                  
-                  className="bg-blue-500 px-6 py-2 rounded-lg text-white hover:bg-blue-700"
-                >
-                  Subscribe (1000tk)
-                </button>
+                <>
+                  <button
+                    onClick={() => setIsModalOpen(true)}
+                    className="bg-blue-500 px-6 py-2 rounded-lg text-white hover:bg-blue-700"
+                  >
+                    Subscribe (1000tk)
+                  </button>
+
+                  <SubscribeModal
+                    isOpen={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                    profile={profile}
+                  />
+                </>
               )}
             </div>
           </div>
