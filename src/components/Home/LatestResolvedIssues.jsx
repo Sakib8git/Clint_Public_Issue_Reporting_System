@@ -1,5 +1,6 @@
 import React from "react";
-import IssueCard from "./IssueCard";
+
+import ResolveCard from "./ResolveCard";
 
 const LatestResolvedIssues = () => {
   
@@ -9,7 +10,7 @@ const LatestResolvedIssues = () => {
         Latest Resolved Issue
       </h2>
 
-      <IssueCard></IssueCard>
+      <ResolveCard></ResolveCard>
     </div>
   );
 };

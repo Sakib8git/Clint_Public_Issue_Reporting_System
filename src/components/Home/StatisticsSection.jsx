@@ -75,7 +75,7 @@ const StatisticsSection = () => {
     {
       id: 2,
       icon: <FaCheckCircle className="text-green-600 text-4xl" />,
-      value: reports.filter((r) => r.status === "resolved").length,
+      // value: reports.filter((r) => r.status === "resolved").length,
       label: "Issues Resolved",
     },
     {

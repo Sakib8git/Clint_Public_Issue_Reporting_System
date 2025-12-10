@@ -9,9 +9,8 @@ const statusFlow = {
   pending: "in-progress",
   "in-progress": "working",
   working: "resolved",
-  resolved: "closed",
 };
-const statusOptions = ["in-progress", "working", "resolved", "closed"];
+const statusOptions = ["in-progress", "working", "resolved"];
 
 const AssignedIssues = () => {
   const axiosSecure = useAxiosSecure();
@@ -23,12 +22,13 @@ const AssignedIssues = () => {
     data: issues = [],
     isLoading,
     isError,
+    refetch, // ✅ add refetch
   } = useQuery({
-    queryKey: ["assigned-issues", user?.displayName],
-    enabled: !!user?.displayName,
+    queryKey: ["assigned-issues", user?.email],
+    enabled: !!user?.email,
     queryFn: async () => {
       const res = await axiosSecure.get(
-        `${import.meta.env.VITE_API_URL}/reports/assigned/${user.displayName}`
+        `${import.meta.env.VITE_API_URL}/reports/assigned/${user.email}`
       );
       return res.data;
     },
@@ -42,9 +42,14 @@ const AssignedIssues = () => {
       });
       return res.data;
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       toast.success("Status updated!");
-      queryClient.invalidateQueries(["assigned-issues", user?.displayName]); // refresh UI
+      // ✅ If resolved, refetch to remove from UI
+      if (variables.newStatus === "resolved") {
+        refetch();
+      } else {
+        queryClient.invalidateQueries(["assigned-issues", user?.email]);
+      }
     },
     onError: () => {
       toast.error("Failed to update status");

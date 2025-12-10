@@ -8,7 +8,7 @@ import Container from "../../../../components/Shared/Container";
 
 const AdminIssues = () => {
   const [selectedIssue, setSelectedIssue] = useState(null);
-  const [selectedStaff, setSelectedStaff] = useState("");
+  const [selectedStaff, setSelectedStaff] = useState(""); // will hold staff email
   const queryClient = useQueryClient();
 
   const axiosSecure = useAxiosSecure();
@@ -46,8 +46,10 @@ const AdminIssues = () => {
   // ✅ Assign mutation
   const assignMutation = useMutation({
     mutationFn: async ({ issueId, staff }) => {
+      // staff object will contain both email + name
       const res = await axiosSecure.put(`/reports/${issueId}/assign`, {
-        staffName: staff,
+        staffEmail: staff.email,
+        staffName: staff.name,
       });
       return res.data;
     },
@@ -130,7 +132,9 @@ const AdminIssues = () => {
                 <td className="p-2 capitalize">{issue.status}</td>
                 <td className="p-2 capitalize">{issue.priority}</td>
                 <td className="p-2">
-                  {issue.assignedStaff ? issue.assignedStaff : "Not Assigned"}
+                  {issue.assignedStaff
+                    ? `${issue.assignedStaff.name} (${issue.assignedStaff.email})`
+                    : "Not Assigned"}
                 </td>
                 <td className="p-2 flex gap-2">
                   {/* Assign Staff button only if status is pending */}
@@ -171,8 +175,8 @@ const AdminIssues = () => {
               >
                 <option value="">Select Staff</option>
                 {staffList.map((staff) => (
-                  <option key={staff._id} value={staff.name}>
-                    {staff.name}
+                  <option key={staff._id} value={staff.email}>
+                    {staff.name} ({staff.email})
                   </option>
                 ))}
               </select>
@@ -184,12 +188,17 @@ const AdminIssues = () => {
                   Cancel
                 </button>
                 <button
-                  onClick={() =>
-                    assignMutation.mutate({
-                      issueId: selectedIssue,
-                      staff: selectedStaff,
-                    })
-                  }
+                  onClick={() => {
+                    const staffObj = staffList.find(
+                      (s) => s.email === selectedStaff
+                    );
+                    if (staffObj) {
+                      assignMutation.mutate({
+                        issueId: selectedIssue,
+                        staff: staffObj,
+                      });
+                    }
+                  }}
                   disabled={!selectedStaff}
                   className="bg-blue-500 px-4 py-2 rounded text-white hover:bg-blue-700 disabled:opacity-50"
                 >
