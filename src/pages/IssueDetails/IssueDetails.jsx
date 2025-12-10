@@ -213,32 +213,7 @@ const IssueDetails = () => {
             </div>
           </div>
         </div>
-        {/* {issue.reporter && (
-          <div className="bg-white shadow rounded-lg p-6 mt-8">
-            <h2 className="text-xl font-bold mb-2">Reported By</h2>
-            <p>
-              <span className="font-semibold">Name:</span> {issue.reporter.name}
-            </p>
-            <p>
-              <span className="font-semibold">Email:</span>{" "}
-              {issue.reporter.email}
-            </p>
-            {issue.lastUpdated && (
-              <p>
-                <span className="font-semibold">Last Updated:</span>{" "}
-                {new Date(issue.lastUpdated).toLocaleString("en-US", {
-                  month: "numeric",
-                  day: "numeric",
-                  year: "numeric",
-                  hour: "numeric",
-                  minute: "numeric",
-                  second: "numeric",
-                  hour12: true,
-                })}
-              </p>
-            )}
-          </div>
-        )} */}
+
         {showModal && (
           <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center">
             <div className="bg-white rounded-lg p-6 w-96 shadow-lg">
@@ -320,36 +295,50 @@ const IssueDetails = () => {
           )}
 
           {/* Step 2: Assigned Staff */}
-          <div className="mb-10 ml-6">
-            <div className="absolute w-3 h-3 bg-blue-500 rounded-full -left-1.5 border border-white"></div>
-            <h3 className="text-lg font-semibold">Assigned Staff</h3>
-            <p className="text-sm text-gray-600">
-              <span className="font-semibold">Name:</span> John Doe
-            </p>
-            <p className="text-sm text-gray-600">
-              <span className="font-semibold">Role:</span> Road Maintenance
-              Supervisor
-            </p>
-            <p className="text-sm text-gray-600">
-              <span className="font-semibold">Contact:</span> john.doe@city.gov
-            </p>
-            <p className="text-sm text-gray-600">
-              <span className="font-semibold">Assigned On:</span> 12/7/2025,
-              6:45 PM
-            </p>
-            <p className="text-xs text-gray-500 mt-1">
-              Assigned by{" "}
-              <span className="font-semibold text-blue-600">Admin Panel</span>
-            </p>
-          </div>
+          {issue?.assignedStaff && issue?.staffInfo && (
+            <div className="mb-10 ml-6 relative">
+              <div className="absolute w-3 h-3 bg-blue-500 rounded-full -left-1.5 border border-white"></div>
+              <h3 className="text-lg font-semibold">Assigned Staff</h3>
+
+              <p className="text-sm text-gray-600">
+                <span className="font-semibold">Name:</span>{" "}
+                {issue.staffInfo.name}
+              </p>
+              <p className="text-sm text-gray-600">
+                <span className="font-semibold">Role:</span>{" "}
+                {issue.staffInfo.role}
+              </p>
+              <p className="text-sm text-gray-600">
+                <span className="font-semibold">Contact:</span>{" "}
+                {issue.staffInfo.email}
+              </p>
+              {/* <p className="text-sm text-gray-600">
+                <span className="font-semibold">Assigned On:</span>{" "}
+                {new Date(issue.statusUpdatedAt).toLocaleString()}
+              </p> */}
+              <p className="text-sm text-gray-600">
+                <span className="font-semibold">Status:</span> {issue.status}
+              </p>
+              <p className="text-xs text-gray-500 mt-1">
+                Assigned by{" "}
+                <span className="font-semibold text-blue-600">
+                  {issue.assignedBy || "Admin Panel"}
+                </span>
+              </p>
+            </div>
+          )}
           {/* ---------------------- */}
 
           {/* ---------------------- */}
           {/* Step 3: Resolved (Optional future step) */}
-          {issue.status === "Resolved" && (
+          {issue.status === "resolved" && (
             <div className="mb-10 ml-6">
               <div className="absolute w-3 h-3 bg-purple-500 rounded-full -left-1.5 border border-white"></div>
-              <h3 className="text-lg font-semibold">Issue Resolved</h3>
+              <h3 className="text-lg font-semibold">Issue Closed</h3>
+              <p className="text-sm text-gray-600">
+                <span className="font-semibold">Closed By:</span>{" "}
+                {issue.staffInfo}
+              </p>
               <p className="text-sm text-gray-600">
                 <span className="font-semibold">Status:</span> {issue.status}
               </p>
@@ -369,6 +358,9 @@ const IssueDetails = () => {
               )}
             </div>
           )}
+
+          
+          {/* ------------------------- */}
         </div>
       </div>
     </Container>
