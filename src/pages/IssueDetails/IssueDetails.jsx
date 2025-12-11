@@ -106,10 +106,50 @@ const IssueDetails = () => {
   if (isLoading) return <LoadingSpinner />;
   if (isError) return <p className="text-red-500">Failed to load issue</p>;
 
+  // const canEdit =
+  //   issue.reporter?.email === user?.email && issue.status === "Pending";
+  // const canDelete = issue.reporter?.email === user?.email;
+  // const canBoost =issue.reporter?.email === user?.email && !issue.boosted;
   const canEdit =
     issue.reporter?.email === user?.email && issue.status === "Pending";
-  const canDelete = issue.reporter?.email === user?.email;
-  const canBoost = !issue.boosted;
+
+  const canDelete =
+    issue.reporter?.email === user?.email && issue.status === "Pending";
+
+  const canBoost =
+    issue.reporter?.email === user?.email &&
+    issue.status === "Pending" &&
+    !issue.boosted;
+
+  // boost
+  const handleBoost = async () => {
+    try {
+      // Boost payment info backend এ পাঠানো হবে
+      const paymentInfo = {
+        issueId: issue._id, // ✅ backend metadata তে যাবে
+        email: user?.email, // ✅ customer_email
+        charge: 100, // ✅ amount in USD (example: $100)
+        title: issue.title, // ✅ product name
+        image: issue.image, // ✅ product image
+      };
+      console.log(paymentInfo);
+      // Backend এ call
+      const res = await axiosSecure.post(
+        `${import.meta.env.VITE_API_URL}/create-boost-session`,
+        paymentInfo
+      );
+
+      // Stripe checkout এ redirect
+      if (res.data.url) {
+        window.location.href = res.data.url;
+      } else {
+        toast.error("Failed to get Stripe session URL");
+      }
+    } catch (err) {
+      console.error("Boost error:", err);
+      toast.error("Failed to initiate boost payment");
+    }
+  };
 
   return (
     <Container>
@@ -206,7 +246,10 @@ const IssueDetails = () => {
                 )}
               </div>
               {canBoost && (
-                <button className="flex items-center gap-2 px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600">
+                <button
+                  onClick={handleBoost} // ✅ handler added
+                  className="flex items-center gap-2 px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600"
+                >
                   <FaBolt /> Boost Priority (100৳)
                 </button>
               )}
@@ -359,7 +402,6 @@ const IssueDetails = () => {
             </div>
           )}
 
-          
           {/* ------------------------- */}
         </div>
       </div>

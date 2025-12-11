@@ -26,6 +26,7 @@ import About from "../pages/IssueDetails/About/About";
 import Feedback from "../pages/Home/Feedback/Feedback";
 import UpdateProfile from "../pages/IssueDetails/UpdateProfile/UpdateProfile";
 import BoostPaySuccess from "../pages/PaymentSuccess/BoostPaySuccess/BoostPaySuccess";
+import HighSuccess from "../pages/PaymentSuccess/highSuccess";
 
 export const router = createBrowserRouter([
   {
@@ -52,6 +53,10 @@ export const router = createBrowserRouter([
       {
         path: "boost-pay-success",
         element: <BoostPaySuccess />,
+      },
+      {
+        path: "high-pay-success/:id",
+        element: <HighSuccess />,
       },
       {
         path: "/issue-details/:id",

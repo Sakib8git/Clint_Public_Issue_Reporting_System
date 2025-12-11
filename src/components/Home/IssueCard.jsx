@@ -9,14 +9,14 @@ import LoadingSpinner from "../Shared/LoadingSpinner";
 const IssuesCard = () => {
   const axiosSecure = useAxiosSecure();
 
-  // ✅ useQuery দিয়ে issues fetch
+ 
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["issues"],
     queryFn: async () => {
       const res = await axiosSecure.get(
         `${import.meta.env.VITE_API_URL}/reports-paginated`
       );
-      return res.data; // { issues, total, ... }
+      return res.data; 
     },
   });
 
@@ -30,7 +30,7 @@ const IssuesCard = () => {
 
       if (res.data.result?.modifiedCount > 0) {
         toast.success("Upvoted successfully!");
-        refetch(); // ✅ instant refresh
+        refetch(); 
       } else {
         toast.error(res.data.message || "Already upvoted");
       }
