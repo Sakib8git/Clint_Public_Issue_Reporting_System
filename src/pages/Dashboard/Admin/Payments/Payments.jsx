@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import useAxiosSecure from "../../../../hooks/useAxiosSecure";
+import Container from "../../../../components/Shared/Container";
 
 const Payments = () => {
   const axiosSecure = useAxiosSecure();
@@ -83,11 +84,11 @@ const Payments = () => {
     .filter((p) => (filterDate ? p.date === filterDate : true));
 
   return (
-    <div className="p-6">
+    <div className="p-6 ">
       <h1 className="text-2xl font-bold mb-4">Payments</h1>
 
       {/* Filters */}
-      <div className="flex gap-4 mb-6">
+      <div className="flex gap-4  mb-6">
         <select
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
@@ -118,32 +119,34 @@ const Payments = () => {
       </div>
 
       {/* Table */}
-      <table className="w-full border text-left">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="p-2">Payment ID</th>
-            <th className="p-2">User</th>
-            <th className="p-2">Amount</th>
-            <th className="p-2">Method</th>
-            <th className="p-2">Status</th>
-            <th className="p-2">Date</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredPayments.map((payment) => (
-            <tr key={payment.id}>
-              <td className="p-2">{payment.id}</td>
-              <td className="p-2">{payment.user}</td>
-              <td className="p-2">{payment.amount} tk</td>
-              <td className="p-2">{payment.method}</td>
-              <td className="p-2 text-green-600 capitalize">
-                {payment.status}
-              </td>
-              <td className="p-2">{payment.date}</td>
+      <Container>
+        <table className="w-full bg-amber-50  rounded-2xl text-left">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="p-2">Payment ID</th>
+              <th className="p-2">User</th>
+              <th className="p-2">Amount</th>
+              <th className="p-2">Method</th>
+              <th className="p-2">Status</th>
+              <th className="p-2">Date</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {filteredPayments.map((payment) => (
+              <tr key={payment.id}>
+                <td className="p-2">{payment.id}</td>
+                <td className="p-2">{payment.user}</td>
+                <td className="p-2">{payment.amount} tk</td>
+                <td className="p-2">{payment.method}</td>
+                <td className="p-2 text-green-600 capitalize">
+                  {payment.status}
+                </td>
+                <td className="p-2">{payment.date}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </Container>
     </div>
   );
 };

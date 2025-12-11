@@ -9,6 +9,7 @@ import {
   createUserWithEmailAndPassword,
   updateProfile,
 } from "firebase/auth";
+import Container from "../../../../components/Shared/Container";
 
 const ManageStaff = () => {
   const auth = getAuth();
@@ -24,7 +25,6 @@ const ManageStaff = () => {
     role: "staff",
   });
 
-  // ✅ Fetch staff list from DB
   const {
     data: staffList = [],
     isLoading,
@@ -54,20 +54,7 @@ const ManageStaff = () => {
         return;
       }
 
-      // 1️⃣ Firebase Auth user create
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        formData.email,
-        formData.password
-      );
 
-      // 2️⃣ Profile update
-      await updateProfile(userCredential.user, {
-        displayName: formData.name,
-        photoURL: formData.photo,
-      });
-
-      // 3️⃣ Save in DB
       const staffData = {
         name: formData.name,
         email: formData.email,
@@ -100,6 +87,53 @@ const ManageStaff = () => {
       toast.error(err?.message || "Failed to add staff");
     }
   };
+
+  // Add Staff
+  // const handleAddStaff = async () => {
+  //   try {
+  //     if (
+  //       !formData.name ||
+  //       !formData.email ||
+  //       !formData.phone ||
+  //       !formData.password
+  //     ) {
+  //       toast.error("Please fill all required fields");
+  //       return;
+  //     }
+
+  //     // ✅ শুধু backend এ পাঠাও
+  //     const staffData = {
+  //       name: formData.name,
+  //       email: formData.email,
+  //       phone: formData.phone,
+  //       photo: formData.photo,
+  //       password: formData.password, // backend এ Admin SDK দিয়ে user তৈরি হবে
+  //       role: "staff",
+  //     };
+
+  //     const res = await axiosSecure.post(
+  //       `${import.meta.env.VITE_API_URL}/staff`,
+  //       staffData
+  //     );
+
+  //     if (res.data.insertedId || res.data.acknowledged) {
+  //       toast.success("Staff added successfully!");
+  //       refetch();
+  //       setShowAddModal(false);
+  //       setFormData({
+  //         name: "",
+  //         email: "",
+  //         phone: "",
+  //         photo: "",
+  //         password: "",
+  //         role: "staff",
+  //       });
+  //     }
+  //   } catch (err) {
+  //     console.error("Add staff error:", err);
+  //     toast.error(err?.message || "Failed to add staff");
+  //   }
+  // };
 
   // Update Staff
   const handleUpdateStaff = async () => {
@@ -158,8 +192,10 @@ const ManageStaff = () => {
   };
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Manage Staff</h1>
+    <div className="p-6 bg-gray-50 min-h-screen">
+      <h1 className="text-3xl font-extrabold mb-6 text-gray-800 border-b pb-2">
+        Manage Staff
+      </h1>
 
       {/* Add Staff Button */}
       <button
@@ -174,66 +210,79 @@ const ManageStaff = () => {
           });
           setShowAddModal(true);
         }}
-        className="bg-blue-500 px-4 py-2 rounded text-white hover:bg-blue-700 mb-4"
+        className="bg-gradient-to-r from-blue-500 to-blue-600 px-5 py-2 rounded-lg text-white font-semibold shadow hover:from-blue-600 hover:to-blue-700 transition mb-6"
       >
-        Add Staff
+        + Add Staff
       </button>
 
       {/* Staff Table */}
-      <table className="w-full border text-left">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="p-2">Photo</th>
-            <th className="p-2">Name</th>
-            <th className="p-2">Email</th>
-            <th className="p-2">Phone</th>
-            <th className="p-2">Role</th>
-            <th className="p-2">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {staffList.map((staff) => (
-            <tr key={staff._id}>
-              <td className="p-2">
-                {staff.photo ? (
-                  <img
-                    src={staff.photo}
-                    alt={staff.name}
-                    className="h-10 w-10 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center text-xs text-gray-600">
-                    No Photo
-                  </div>
-                )}
-              </td>
-              <td className="p-2">{staff.name}</td>
-              <td className="p-2">{staff.email}</td>
-              <td className="p-2">{staff.phone}</td>
-              <td className="p-2 capitalize">{staff.role}</td>
-              <td className="p-2 flex gap-2">
-                <button
-                  onClick={() => {
-                    setFormData(staff);
-                    setShowUpdateModal(true);
-                  }}
-                  className="bg-green-500 px-3 py-1 rounded text-white hover:bg-green-700"
+      <Container>
+        <div className="overflow-x-auto rounded-lg shadow-lg bg-white">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-gray-100 text-gray-700 uppercase text-sm">
+                <th className="p-3">Photo</th>
+                <th className="p-3">Name</th>
+                <th className="p-3">Email</th>
+                <th className="p-3">Phone</th>
+                <th className="p-3">Role</th>
+                <th className="p-3">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {staffList.map((staff, idx) => (
+                <tr
+                  key={staff._id}
+                  className={`border-b hover:bg-gray-50 ${
+                    idx % 2 === 0 ? "bg-white" : "bg-gray-50"
+                  }`}
                 >
-                  Update
-                </button>
-                <button
-                  onClick={() => handleDeleteStaff(staff._id)}
-                  className="bg-red-500 px-3 py-1 rounded text-white hover:bg-red-700"
-                >
-                  Delete
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                  <td className="p-3">
+                    {staff.photo ? (
+                      <img
+                        src={staff.photo}
+                        alt={staff.name}
+                        className="h-12 w-12 rounded-full object-cover border-2 border-gray-200"
+                      />
+                    ) : (
+                      <div className="h-12 w-12 rounded-full bg-gray-300 flex items-center justify-center text-xs text-gray-600">
+                        No Photo
+                      </div>
+                    )}
+                  </td>
+                  <td className="p-3 font-medium text-gray-800">
+                    {staff.name}
+                  </td>
+                  <td className="p-3 text-gray-600">{staff.email}</td>
+                  <td className="p-3 text-gray-600">{staff.phone}</td>
+                  <td className="p-3 capitalize text-indigo-600 font-semibold">
+                    {staff.role}
+                  </td>
+                  <td className="p-3 flex gap-2">
+                    <button
+                      onClick={() => {
+                        setFormData(staff);
+                        setShowUpdateModal(true);
+                      }}
+                      className="bg-green-500 px-3 py-1 rounded-md text-white hover:bg-green-600 transition shadow-sm"
+                    >
+                      Update
+                    </button>
+                    <button
+                      onClick={() => handleDeleteStaff(staff._id)}
+                      className="bg-red-500 px-3 py-1 rounded-md text-white hover:bg-red-600 transition shadow-sm"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Container>
 
-      {/* Add Staff Modal */}
+      {/* Modals */}
       <StaffModal
         isOpen={showAddModal}
         close={() => setShowAddModal(false)}
@@ -244,7 +293,6 @@ const ManageStaff = () => {
         onConfirm={handleAddStaff}
       />
 
-      {/* Update Staff Modal (only name + phone) */}
       <StaffModal
         isOpen={showUpdateModal}
         close={() => setShowUpdateModal(false)}
@@ -254,16 +302,6 @@ const ManageStaff = () => {
         setFormData={setFormData}
         onConfirm={handleUpdateStaff}
       />
-      {/* <StaffModal
-        isOpen={showUpdateModal}
-        close={() => setShowUpdateModal(false)}
-        title="Update Staff"
-        // ✅ Only name + phone editable, email readonly
-        fields={["name", "phone", "email"]}
-        formData={formData}
-        setFormData={setFormData}
-        onConfirm={handleUpdateStaff}
-      /> */}
     </div>
   );
 };
