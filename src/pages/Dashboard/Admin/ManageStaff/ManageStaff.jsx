@@ -54,12 +54,12 @@ const ManageStaff = () => {
         return;
       }
 
-
       const staffData = {
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
         photo: formData.photo,
+        password: formData.password,
         role: "staff",
         createdAt: new Date(),
       };
