@@ -1,91 +1,134 @@
-import { FaUserAlt, FaDollarSign } from 'react-icons/fa'
-import { BsFillCartPlusFill, BsFillHouseDoorFill } from 'react-icons/bs'
+import {
+  FaUserAlt,
+  FaDollarSign,
+} from "react-icons/fa";
+import {
+  BsFillCartPlusFill,
+  BsFillHouseDoorFill,
+} from "react-icons/bs";
+import { MdReportProblem } from "react-icons/md";
+import {
+  AiOutlineCheckCircle,
+  AiOutlineClockCircle,
+  AiOutlineCloseCircle,
+} from "react-icons/ai";
+import { useQuery } from "@tanstack/react-query";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
+import LoadingSpinner from "../../Shared/LoadingSpinner";
+import Container from "../../Shared/Container";
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+  CartesianGrid,
+} from "recharts";
 
 const AdminStatistics = () => {
-  return (
-    <div>
-      <div className='mt-12'>
-        {/* small cards */}
-        <div className='mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 grow'>
-          {/* Sales Card */}
-          <div className='relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md'>
-            <div
-              className={`bg-clip-border mx-4 rounded-xl overflow-hidden bg-linear-to-tr shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center from-orange-600 to-orange-400 text-white shadow-orange-500/40`}
-            >
-              <FaDollarSign className='w-6 h-6 text-white' />
-            </div>
-            <div className='p-4 text-right'>
-              <p className='block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600'>
-                Total Revenue
-              </p>
-              <h4 className='block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900'>
-                $120
-              </h4>
-            </div>
-          </div>
-          {/* Total Orders */}
-          <div className='relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md'>
-            <div
-              className={`bg-clip-border mx-4 rounded-xl overflow-hidden bg-linear-to-tr shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center from-blue-600 to-blue-400 text-white shadow-blue-500/40`}
-            >
-              <BsFillCartPlusFill className='w-6 h-6 text-white' />
-            </div>
-            <div className='p-4 text-right'>
-              <p className='block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600'>
-                Total Orders
-              </p>
-              <h4 className='block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900'>
-                120
-              </h4>
-            </div>
-          </div>
-          {/* Total Plants */}
-          <div className='relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md'>
-            <div
-              className={`bg-clip-border mx-4 rounded-xl overflow-hidden bg-linear-to-tr shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center from-pink-600 to-pink-400 text-white shadow-pink-500/40`}
-            >
-              <BsFillHouseDoorFill className='w-6 h-6 text-white' />
-            </div>
-            <div className='p-4 text-right'>
-              <p className='block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600'>
-                Total Plants
-              </p>
-              <h4 className='block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900'>
-                120
-              </h4>
-            </div>
-          </div>
-          {/* Users Card */}
-          <div className='relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md'>
-            <div
-              className={`bg-clip-border mx-4 rounded-xl overflow-hidden bg-linear-to-tr shadow-lg absolute -mt-4 grid h-16 w-16 place-items-center from-green-600 to-green-400 text-white shadow-green-500/40`}
-            >
-              <FaUserAlt className='w-6 h-6 text-white' />
-            </div>
-            <div className='p-4 text-right'>
-              <p className='block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-600'>
-                Total User
-              </p>
-              <h4 className='block antialiased tracking-normal font-sans text-2xl font-semibold leading-snug text-blue-gray-900'>
-                10
-              </h4>
-            </div>
-          </div>
-        </div>
+  const axiosSecure = useAxiosSecure();
 
-        <div className='mb-4 grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3'>
-          {/*Sales Bar Chart */}
-          <div className='relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md overflow-hidden xl:col-span-2'>
-            {/* Chart goes here.. */}
-          </div>
-          {/* Calender */}
-          <div className=' relative flex flex-col bg-clip-border rounded-xl bg-white text-gray-700 shadow-md overflow-hidden'>
-            {/* Calender */}
-          </div>
-        </div>
+  const { data: reports = [], isLoading } = useQuery({
+    queryKey: ["reports"],
+    queryFn: async () => {
+      const res = await axiosSecure.get(
+        `${import.meta.env.VITE_API_URL}/reports`
+      );
+      return res.data;
+    },
+  });
+
+  const totalIssues = reports.length;
+  const resolvedIssues = reports.filter((r) => r.status === "resolved").length;
+  const pendingIssues = reports.filter((r) => r.status === "pending").length;
+  const rejectedIssues = reports.filter((r) => r.status === "rejected").length;
+
+  const chartData = [
+    { name: "Resolved", value: resolvedIssues },
+    { name: "Pending", value: pendingIssues },
+    { name: "Rejected", value: rejectedIssues },
+  ];
+
+  return (
+    <Container>
+      <h1 className="text-center text-3xl font-bold lg:mt-25">Dashbord</h1>
+      <div className="mt-10 px-4 md:px-8">
+        {isLoading ? (
+          <LoadingSpinner />
+        ) : (
+          <>
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 mb-12">
+              <StatCard
+                icon={<MdReportProblem className="w-7 h-7 text-white" />}
+                title="Total Issues"
+                value={totalIssues}
+                gradient="bg-gradient-to-r from-red-600 to-red-400"
+              />
+              <StatCard
+                icon={<AiOutlineCheckCircle className="w-7 h-7 text-white" />}
+                title="Resolved Issues"
+                value={resolvedIssues}
+                gradient="bg-gradient-to-r from-teal-600 to-teal-400"
+              />
+              <StatCard
+                icon={<AiOutlineClockCircle className="w-7 h-7 text-white" />}
+                title="Pending Issues"
+                value={pendingIssues}
+                gradient="bg-gradient-to-r from-yellow-600 to-yellow-400"
+              />
+              <StatCard
+                icon={<AiOutlineCloseCircle className="w-7 h-7 text-white" />}
+                title="Rejected Issues"
+                value={rejectedIssues}
+                gradient="bg-gradient-to-r from-gray-600 to-gray-400"
+              />
+              <StatCard
+                icon={<FaUserAlt className="w-7 h-7 text-white" />}
+                title="Total Users"
+                value="10"
+                gradient="bg-gradient-to-r from-purple-600 to-purple-400"
+              />
+            </div>
+
+            {/* ✅ Recharts Bar Chart */}
+            <div className="bg-white rounded-xl shadow-md p-6">
+              <h2 className="text-xl font-semibold text-gray-700 mb-4">
+                Issue Status Overview
+              </h2>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="value" fill="#8884d8" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </>
+        )}
+      </div>
+    </Container>
+  );
+};
+
+const StatCard = ({ icon, title, value, gradient }) => (
+  <div className="flex flex-col justify-between bg-white rounded-xl shadow-lg p-6 border-t-4 transition hover:scale-[1.02] duration-300">
+    <div className="flex items-center justify-between mb-4">
+      <div
+        className={`h-14 w-14 rounded-full grid place-items-center text-white text-xl ${gradient}`}
+      >
+        {icon}
       </div>
     </div>
-  )
-}
+    <div className="text-left">
+      <p className="text-lg font-semibold text-gray-700">{title}</p>
+      <h2 className="text-3xl font-bold text-gray-900 mt-1">{value}</h2>
+    </div>
+  </div>
+);
 
-export default AdminStatistics
+export default AdminStatistics;
