@@ -33,6 +33,39 @@ const BoostPaySuccess = () => {
     },
   });
 
+  // const handleActivatePremium = async () => {
+  //   try {
+  //     if (!profile?._id) {
+  //       toast.error("Citizen ID not found");
+  //       return;
+  //     }
+
+  //     // 1️Citizen status update
+  //     await axiosSecure.patch(`/citizen/status/${profile._id}`, {
+  //       status: "premium",
+  //       name: profile?.name || user?.displayName,
+  //       sessionId,
+  //       amount: 1000,
+  //     });
+
+  //     // 2️Payment log insert (payments collection এ save হবে)
+  //     await axiosSecure.post("/payments", {
+  //       citizenId: profile._id,
+  //       name: profile?.name || user?.displayName,
+  //       sessionId,
+  //       amount: 1000,
+  //       status: "success",
+  //       date: new Date(),
+  //     });
+
+  //     toast.success("Premium activated successfully!");
+  //     navigate("/dashboard/cityzen-profile");
+  //   } catch (err) {
+  //     console.error("Activation error:", err.response?.data || err.message);
+  //     toast.error("Failed to activate premium");
+  //   }
+  // };
+
   const handleActivatePremium = async () => {
     try {
       //   console.log(profile._id);

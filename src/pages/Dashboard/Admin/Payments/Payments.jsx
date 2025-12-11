@@ -1,38 +1,52 @@
 import React, { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import useAxiosSecure from "../../../../hooks/useAxiosSecure";
 
-const dummyPayments = [
-  {
-    id: "PAY001",
-    user: "Nazmus Sakib",
-    amount: 1000,
-    method: "Stripe",
-    status: "success",
-    date: "2025-12-01",
-  },
-  {
-    id: "PAY002",
-    user: "Rahim Uddin",
-    amount: 500,
-    method: "Bkash",
-    status: "pending",
-    date: "2025-12-02",
-  },
-  {
-    id: "PAY003",
-    user: "Karim Ali",
-    amount: 1200,
-    method: "Paypal",
-    status: "failed",
-    date: "2025-12-03",
-  },
-];
 
 const Payments = () => {
-  const [payments, setPayments] = useState(dummyPayments);
+  const axiosSecure = useAxiosSecure();
   const [filterStatus, setFilterStatus] = useState("");
   const [filterMethod, setFilterMethod] = useState("");
   const [filterDate, setFilterDate] = useState("");
 
+  // ✅ Fetch citizens with React Query
+  const {
+    data: citizens = [],
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["citizens"],
+    queryFn: async () => {
+      const { data } = await axiosSecure.get("/citizen");
+      return data;
+    },
+  });
+
+  if (isLoading) {
+    return <p className="text-center mt-10">Loading payments...</p>;
+  }
+
+  if (isError) {
+    return (
+      <p className="text-center mt-10 text-red-500">Error loading payments</p>
+    );
+  }
+
+  // ✅ শুধু premium citizen কে payment data তে map করো
+  const payments = citizens
+    .filter((c) => c.status === "premium")
+    .map((c, index) => ({
+      id: `PAY${String(index + 1).padStart(3, "0")}`,
+      user: c.name,
+      amount: 1000, // hardcoded
+      method: "Stripe", // hardcoded
+      status: "success", // সবসময় success
+      date: c.paymentDate
+        ? new Date(c.paymentDate).toISOString().split("T")[0]
+        : "N/A",
+    }));
+
+  // ✅ Filtering logic আগের মতোই থাকবে
   const filteredPayments = payments
     .filter((p) => (filterStatus ? p.status === filterStatus : true))
     .filter((p) => (filterMethod ? p.method === filterMethod : true))
@@ -93,15 +107,7 @@ const Payments = () => {
               <td className="p-2">{payment.user}</td>
               <td className="p-2">{payment.amount} tk</td>
               <td className="p-2">{payment.method}</td>
-              <td
-                className={`p-2 capitalize ${
-                  payment.status === "success"
-                    ? "text-green-600"
-                    : payment.status === "pending"
-                    ? "text-yellow-600"
-                    : "text-red-600"
-                }`}
-              >
+              <td className="p-2 text-green-600 capitalize">
                 {payment.status}
               </td>
               <td className="p-2">{payment.date}</td>
