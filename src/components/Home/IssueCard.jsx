@@ -1,28 +1,48 @@
 import React from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import toast from "react-hot-toast";
 import Container from "../Shared/Container";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 import { useQuery } from "@tanstack/react-query";
 import LoadingSpinner from "../Shared/LoadingSpinner";
+import useAuth from "../../hooks/useAuth";
 
 const IssuesCard = () => {
+  const { user } = useAuth();
   const axiosSecure = useAxiosSecure();
+  const navigate = useNavigate();
+  const { data: citizens = [] } = useQuery({
+    queryKey: ["citizens"],
+    queryFn: async () => {
+      const res = await axiosSecure.get(
+        `${import.meta.env.VITE_API_URL}/citizen`
+      );
+      return res.data;
+    },
+  });
 
- 
+  const currentCitizen = citizens.find((c) => c.email === user?.email);
+  const isBlocked = currentCitizen?.action === "block";
+
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["issues"],
     queryFn: async () => {
       const res = await axiosSecure.get(
         `${import.meta.env.VITE_API_URL}/reports-paginated`
       );
-      return res.data; 
+      return res.data;
     },
   });
 
   const issues = data?.issues || [];
 
   const handleUpvote = async (id) => {
+    if (isBlocked) {
+      toast.error("🚫 You are blocked");
+      navigate("/");
+      return;
+    }
+
     try {
       const res = await axiosSecure.patch(
         `${import.meta.env.VITE_API_URL}/reports/${id}/upvote`
@@ -30,7 +50,7 @@ const IssuesCard = () => {
 
       if (res.data.result?.modifiedCount > 0) {
         toast.success("Upvoted successfully!");
-        refetch(); 
+        refetch();
       } else {
         toast.error(res.data.message || "Already upvoted");
       }
@@ -38,6 +58,23 @@ const IssuesCard = () => {
       toast.error("Failed to upvote");
     }
   };
+
+  // const handleUpvote = async (id) => {
+  //   try {
+  //     const res = await axiosSecure.patch(
+  //       `${import.meta.env.VITE_API_URL}/reports/${id}/upvote`
+  //     );
+
+  //     if (res.data.result?.modifiedCount > 0) {
+  //       toast.success("Upvoted successfully!");
+  //       refetch();
+  //     } else {
+  //       toast.error(res.data.message || "Already upvoted");
+  //     }
+  //   } catch (err) {
+  //     toast.error("Failed to upvote");
+  //   }
+  // };
 
   if (isLoading) return <LoadingSpinner />;
   if (isError) return <p className="text-red-500">Failed to load issues</p>;
