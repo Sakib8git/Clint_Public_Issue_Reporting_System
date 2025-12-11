@@ -34,7 +34,7 @@ const AllIssues = () => {
     <Container>
       <div className="container mx-auto px-4 py-8">
         {/* ✅ Search + Filter UI */}
-        <div className="flex flex-wrap gap-4 mb-6">
+        {/* <div className="flex flex-wrap gap-4 mb-6">
           <input
             type="text"
             placeholder="Search by title or location..."
@@ -73,7 +73,7 @@ const AllIssues = () => {
             <option value="Water">Water</option>
             <option value="Garbage">Garbage</option>
           </select>
-        </div>
+        </div> */}
 
         {/* ✅ Issue Cards */}
         <IssueCard issues={issues} />
