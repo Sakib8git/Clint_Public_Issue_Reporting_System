@@ -2,18 +2,17 @@ import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import useAxiosSecure from "../../../../hooks/useAxiosSecure";
 
-
 const Payments = () => {
   const axiosSecure = useAxiosSecure();
   const [filterStatus, setFilterStatus] = useState("");
   const [filterMethod, setFilterMethod] = useState("");
   const [filterDate, setFilterDate] = useState("");
 
-  // ✅ Fetch citizens with React Query
+  // ✅ Fetch citizens
   const {
     data: citizens = [],
-    isLoading,
-    isError,
+    isLoading: citizensLoading,
+    isError: citizensError,
   } = useQuery({
     queryKey: ["citizens"],
     queryFn: async () => {
@@ -22,31 +21,62 @@ const Payments = () => {
     },
   });
 
-  if (isLoading) {
+  // ✅ Fetch reports (issues)
+  const {
+    data: reports = [],
+    isLoading: reportsLoading,
+    isError: reportsError,
+  } = useQuery({
+    queryKey: ["reports"],
+    queryFn: async () => {
+      const { data } = await axiosSecure.get("/reports");
+      return data;
+    },
+  });
+
+  if (citizensLoading || reportsLoading) {
     return <p className="text-center mt-10">Loading payments...</p>;
   }
 
-  if (isError) {
+  if (citizensError || reportsError) {
     return (
       <p className="text-center mt-10 text-red-500">Error loading payments</p>
     );
   }
 
-  // ✅ শুধু premium citizen কে payment data তে map করো
-  const payments = citizens
+  // ✅ Citizen payments
+  const citizenPayments = citizens
     .filter((c) => c.status === "premium")
     .map((c, index) => ({
-      id: `PAY${String(index + 1).padStart(3, "0")}`,
+      id: `CIT${String(index + 1).padStart(3, "0")}`,
       user: c.name,
-      amount: 1000, // hardcoded
-      method: "Stripe", // hardcoded
-      status: "success", // সবসময় success
+      amount: 1000, // citizen amount
+      method: "Stripe",
+      status: "success",
       date: c.paymentDate
         ? new Date(c.paymentDate).toISOString().split("T")[0]
         : "N/A",
     }));
 
-  // ✅ Filtering logic আগের মতোই থাকবে
+  // ✅ Boosted issue payments (priority High)
+  const issuePayments = reports
+    .filter((r) => r.priority === "High" && r.boosted)
+    .map((r, index) => ({
+      id: `ISS${String(index + 1).padStart(3, "0")}`,
+      user: r.title || "Unknown",
+      // user: r.reporter?.name || "Unknown",
+      amount: 100, // issue amount
+      method: "Stripe",
+      status: "success",
+      date: r.lastUpdated
+        ? new Date(r.lastUpdated).toISOString().split("T")[0]
+        : "N/A",
+    }));
+
+  // ✅ Combine both
+  const payments = [...citizenPayments, ...issuePayments];
+
+  // ✅ Filtering logic
   const filteredPayments = payments
     .filter((p) => (filterStatus ? p.status === filterStatus : true))
     .filter((p) => (filterMethod ? p.method === filterMethod : true))
@@ -77,7 +107,6 @@ const Payments = () => {
           <option value="">Filter by Method</option>
           <option value="Stripe">Stripe</option>
           <option value="Bkash">Bkash</option>
-          <option value="Paypal">Paypal</option>
         </select>
 
         <input
