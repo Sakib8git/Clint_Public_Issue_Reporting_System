@@ -13,41 +13,28 @@ import {
   Tooltip,
   CartesianGrid,
 } from "recharts";
+import useAuth from "../../../hooks/useAuth";
 
-const StaffDashboard = ({ user }) => {
+const StaffDashboard = () => {
+   const { user } = useAuth();
   const axiosSecure = useAxiosSecure();
 
-  // ✅ Fetch staff info
-  const { data: staffList = [], isLoading: staffLoading } = useQuery({
-    queryKey: ["staff"],
+  // ✅ Fetch assigned issues for this staff
+  const { data: assignedIssues = [], isLoading } = useQuery({
+    queryKey: ["assigned-issues", user?.email],
+    enabled: !!user?.email,
     queryFn: async () => {
       const res = await axiosSecure.get(
-        `${import.meta.env.VITE_API_URL}/staff`
+        `${import.meta.env.VITE_API_URL}/reports/assigned/${user.email}`
       );
       return res.data;
     },
   });
 
-  // ✅ Fetch all reports
-  const { data: reports = [], isLoading: reportsLoading } = useQuery({
-    queryKey: ["reports"],
-    queryFn: async () => {
-      const res = await axiosSecure.get(
-        `${import.meta.env.VITE_API_URL}/reports`
-      );
-      return res.data;
-    },
-  });
+  if (isLoading) return <LoadingSpinner />;
 
-  if (staffLoading || reportsLoading) return <LoadingSpinner />;
-
-  // ✅ Current staff (match by email)
-  const currentStaff = staffList.find((s) => s.email === user?.email);
-
-  // ✅ Filter issues assigned to this staff
-  const assignedIssues = reports.filter(
-    (r) => r.assignedStaff?.email === currentStaff?.email
-  );
+  // ✅ Extract staff info from first issue
+  const currentStaff = assignedIssues[0]?.assignedStaff;
 
   // ✅ Stats
   const assignedCount = assignedIssues.length;
@@ -58,13 +45,11 @@ const StaffDashboard = ({ user }) => {
     (r) => r.status === "in-progress"
   ).length;
 
-  // ✅ Today’s tasks (issues assigned today)
   const today = new Date().toISOString().split("T")[0];
   const todaysTasks = assignedIssues.filter(
     (r) => r.assignedAt?.split("T")[0] === today
   ).length;
 
-  // ✅ Chart data
   const chartData = [
     { name: "Assigned", value: assignedCount },
     { name: "Resolved", value: resolvedCount },
@@ -76,7 +61,26 @@ const StaffDashboard = ({ user }) => {
       <h1 className="text-center text-3xl font-bold lg:mt-10">
         Staff Dashboard
       </h1>
-      <div className="mt-10 px-4 md:px-8">
+
+      {/* ✅ Staff Info */}
+      {currentStaff && (
+        <div className="flex items-center gap-4 mt-6 mb-10 px-4 md:px-8">
+          <img
+            src={currentStaff.photo || "https://i.ibb.co/9mdY3skF/staff.jpg"}
+            alt={currentStaff.name}
+            className="w-16 h-16 rounded-full object-cover border-2 border-gray-300"
+          />
+          <div>
+            <h2 className="text-xl font-bold text-gray-800">
+              {currentStaff.name}
+            </h2>
+            <p className="text-sm text-gray-600">{currentStaff.email}</p>
+          </div>
+        </div>
+      )}
+
+      {/* ✅ Stats Cards */}
+      <div className="mt-4 px-4 md:px-8">
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-12">
           <StatCard
             icon={<MdReportProblem className="w-7 h-7 text-white" />}
@@ -104,7 +108,7 @@ const StaffDashboard = ({ user }) => {
           />
         </div>
 
-        {/* Chart */}
+        {/* ✅ Chart */}
         <div className="bg-white rounded-xl shadow-md p-6">
           <h2 className="text-xl font-semibold text-gray-700 mb-4">
             Issue Statistics

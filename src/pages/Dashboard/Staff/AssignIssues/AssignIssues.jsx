@@ -30,6 +30,7 @@ const AssignedIssues = () => {
       const res = await axiosSecure.get(
         `${import.meta.env.VITE_API_URL}/reports/assigned/${user.email}`
       );
+      // console.log(res.data);
       return res.data;
     },
   });
