@@ -8,8 +8,10 @@ import { useNavigate } from "react-router";
 
 import useAxiosSecure from "../../../../hooks/useAxiosSecure";
 import LoadingSpinner from "../../../../components/Shared/LoadingSpinner";
+import useAuth from "../../../../hooks/useAuth";
 
 const MyIssues = () => {
+  const { user } = useAuth();
   const [filterStatus, setFilterStatus] = useState("");
   const [filterCategory, setFilterCategory] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -17,6 +19,20 @@ const MyIssues = () => {
   const navigate = useNavigate();
 
   const axiosSecure = useAxiosSecure();
+
+  // citizen--------------
+  const { data: citizens = [] } = useQuery({
+    queryKey: ["citizens"],
+    queryFn: async () => {
+      const res = await axiosSecure.get(
+        `${import.meta.env.VITE_API_URL}/citizen`
+      );
+      return res.data;
+    },
+  });
+
+  const currentCitizen = citizens.find((c) => c.email === user?.email);
+  const isBlocked = currentCitizen?.action === "block";
 
   // ✅ Fetch issues from backend
   const {
@@ -36,6 +52,11 @@ const MyIssues = () => {
   });
   // edit
   const handleUpdate = async (e) => {
+    if (isBlocked) {
+      toast.error("🚫 You are blocked");
+      navigate("/");
+      return;
+    }
     e.preventDefault();
     const form = e.target;
     const updatedIssue = {
@@ -60,6 +81,12 @@ const MyIssues = () => {
   };
   // delete
   const handleDelete = async (id) => {
+    if (isBlocked) {
+      toast.error("🚫 You are blocked");
+      navigate("/");
+      return;
+    }
+
     Swal.fire({
       title: "Are you sure?",
       text: "You won't be able to revert this!",

@@ -28,6 +28,20 @@ const ReportIssue = () => {
     enabled: !!user?.email,
   });
 
+  // citizen--------------
+  const { data: citizens = [] } = useQuery({
+    queryKey: ["citizens"],
+    queryFn: async () => {
+      const res = await axiosSecure.get(
+        `${import.meta.env.VITE_API_URL}/citizen`
+      );
+      return res.data;
+    },
+  });
+
+  const currentCitizen = citizens.find((c) => c.email === user?.email);
+  const isBlocked = currentCitizen?.action === "block";
+
   // Limit check
   const isLimitReached =
     citizenData?.role === "citizen" &&
@@ -219,8 +233,16 @@ const ReportIssue = () => {
           </div>
 
           {/* Submit */}
-          <div className="flex justify-end">
+          {/* <div className="flex justify-end">
             <Button type="submit" label="Submit Issue" />
+          </div> */}
+          {/* Submit */}
+          <div className="flex justify-end">
+            {isBlocked ? (
+              <p className="text-red-600 font-semibold">🚫 You are blocked</p>
+            ) : (
+              <Button type="submit" label="Submit Issue" />
+            )}
           </div>
         </form>
       </div>
