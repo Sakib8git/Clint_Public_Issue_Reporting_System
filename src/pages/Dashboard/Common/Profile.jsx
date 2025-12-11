@@ -18,6 +18,7 @@ const Profile = () => {
     enabled: !!user?.email,
     queryFn: async () => {
       const { data } = await axiosSecure.get(`/user/${user.email}`);
+      console.log(data.role);
       return data;
     },
   });
@@ -26,6 +27,7 @@ const Profile = () => {
   const { mutate: updateProfile } = useMutation({
     mutationFn: async (data) => {
       const res = await axiosSecure.patch(`/user/${user.email}`, data);
+      console.log(res.data);
       return res.data;
     },
     onSuccess: (res) => {
@@ -61,7 +63,7 @@ const Profile = () => {
           />
 
           <p className="p-2 px-4 text-xs text-white bg-lime-500 rounded-full">
-            Admin
+            {profile?.role}
           </p>
           <p className="mt-2 text-xl font-medium text-gray-800">
             User Id: {user?.uid}

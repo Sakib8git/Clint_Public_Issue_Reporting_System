@@ -57,6 +57,19 @@ const IssueDetails = () => {
       toast.error("Failed to update issue");
     }
   };
+  // citizen--------------
+  const { data: citizens = [] } = useQuery({
+    queryKey: ["citizens"],
+    queryFn: async () => {
+      const res = await axiosSecure.get(
+        `${import.meta.env.VITE_API_URL}/citizen`
+      );
+      return res.data;
+    },
+  });
+
+  const currentCitizen = citizens.find((c) => c.email === user?.email);
+  const isBlocked = currentCitizen?.action === "block";
 
   //!note: delete----------------------------------------------
   const handleDelete = async () => {
@@ -110,13 +123,19 @@ const IssueDetails = () => {
   //   issue.reporter?.email === user?.email && issue.status === "Pending";
   // const canDelete = issue.reporter?.email === user?.email;
   // const canBoost =issue.reporter?.email === user?.email && !issue.boosted;
+  // permissions
   const canEdit =
-    issue.reporter?.email === user?.email && issue.status === "Pending";
+    !isBlocked &&
+    issue.reporter?.email === user?.email &&
+    issue.status === "Pending";
 
   const canDelete =
-    issue.reporter?.email === user?.email && issue.status === "Pending";
+    !isBlocked &&
+    issue.reporter?.email === user?.email &&
+    issue.status === "Pending";
 
   const canBoost =
+    !isBlocked &&
     issue.reporter?.email === user?.email &&
     issue.status === "Pending" &&
     !issue.boosted;
@@ -126,11 +145,11 @@ const IssueDetails = () => {
     try {
       // Boost payment info backend এ পাঠানো হবে
       const paymentInfo = {
-        issueId: issue._id, // ✅ backend metadata তে যাবে
-        email: user?.email, // ✅ customer_email
-        charge: 100, // ✅ amount in USD (example: $100)
-        title: issue.title, // ✅ product name
-        image: issue.image, // ✅ product image
+        issueId: issue._id,
+        email: user?.email,
+        charge: 100,
+        title: issue.title,
+        image: issue.image,
       };
       console.log(paymentInfo);
       // Backend এ call
@@ -245,13 +264,27 @@ const IssueDetails = () => {
                   </button>
                 )}
               </div>
-              {canBoost && (
+              {/* {canBoost && (
                 <button
                   onClick={handleBoost} // ✅ handler added
                   className="flex items-center gap-2 px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600"
                 >
                   <FaBolt /> Boost Priority (100৳)
                 </button>
+              )} */}
+              {isBlocked ? (
+                <p className="text-red-600 font-semibold mt-2">
+                  🚫 You are blocked. Actions are disabled.
+                </p>
+              ) : (
+                canBoost && (
+                  <button
+                    onClick={handleBoost}
+                    className="flex items-center gap-2 px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600"
+                  >
+                    <FaBolt /> Boost Priority (100৳)
+                  </button>
+                )
               )}
             </div>
           </div>

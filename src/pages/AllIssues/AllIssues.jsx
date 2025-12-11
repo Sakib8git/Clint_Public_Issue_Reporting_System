@@ -22,7 +22,7 @@ const AllIssues = () => {
       );
       return res.data;
     },
-    refetchOnWindowFocus: false, // ✅ শুধু input change এ refetch হবে
+    refetchOnWindowFocus: false, 
   });
 
   const issues = data?.issues || [];

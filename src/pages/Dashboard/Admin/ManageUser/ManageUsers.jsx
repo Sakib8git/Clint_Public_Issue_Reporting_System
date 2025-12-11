@@ -37,7 +37,7 @@ const ManageUsers = () => {
       if (result.isConfirmed) {
         // ✅ Patch request to backend
         axiosSecure
-          .patch(`/citizen/${userId}`, { action: newAction })
+          .patch(`/citizen/action/${userId}`, { action: newAction })
           .then((res) => {
             if (res.data.modifiedCount > 0) {
               // update local state
