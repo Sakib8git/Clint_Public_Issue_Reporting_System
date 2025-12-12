@@ -65,7 +65,6 @@ const Payments = () => {
     .map((r, index) => ({
       id: `ISS${String(index + 1).padStart(3, "0")}`,
       user: r.title || "Unknown",
-      // user: r.reporter?.name || "Unknown",
       amount: 100, // issue amount
       method: "Stripe",
       status: "success",
@@ -83,9 +82,17 @@ const Payments = () => {
     .filter((p) => (filterMethod ? p.method === filterMethod : true))
     .filter((p) => (filterDate ? p.date === filterDate : true));
 
+  // ✅ Total amount
+  const totalAmount = filteredPayments.reduce((sum, p) => sum + p.amount, 0);
+
   return (
     <div className="p-6 ">
       <h1 className="text-2xl font-bold mb-4">Payments</h1>
+
+      {/* ✅ Total Amount */}
+      <div className="mb-4 text-lg font-semibold text-blue-600">
+        Total Amount: {totalAmount} tk
+      </div>
 
       {/* Filters */}
       <div className="flex gap-4  mb-6">
@@ -129,6 +136,7 @@ const Payments = () => {
               <th className="p-2">Method</th>
               <th className="p-2">Status</th>
               <th className="p-2">Date</th>
+              <th className="p-2">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -142,6 +150,16 @@ const Payments = () => {
                   {payment.status}
                 </td>
                 <td className="p-2">{payment.date}</td>
+                <td className="p-2">
+                  <button
+                    className="px-3 py-1 bg-gradient-to-r from-blue-500 to-indigo-600 
+                               text-white font-semibold rounded-lg shadow-md 
+                               transition-transform transform hover:scale-105 
+                               hover:from-indigo-600 hover:to-blue-500"
+                  >
+                    Download
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>

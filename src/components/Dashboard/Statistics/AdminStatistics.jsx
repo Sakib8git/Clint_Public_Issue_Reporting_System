@@ -1,11 +1,5 @@
-import {
-  FaUserAlt,
-  FaDollarSign,
-} from "react-icons/fa";
-import {
-  BsFillCartPlusFill,
-  BsFillHouseDoorFill,
-} from "react-icons/bs";
+import { FaUserAlt, FaDollarSign } from "react-icons/fa";
+import { BsFillCartPlusFill, BsFillHouseDoorFill } from "react-icons/bs";
 import { MdReportProblem } from "react-icons/md";
 import {
   AiOutlineCheckCircle,
@@ -39,11 +33,34 @@ const AdminStatistics = () => {
       return res.data;
     },
   });
+  const { data: citizens = [] } = useQuery({
+    queryKey: ["citizens"],
+    queryFn: async () => {
+      const res = await axiosSecure.get(
+        `${import.meta.env.VITE_API_URL}/citizen`
+      );
+      return res.data;
+    },
+  });
 
   const totalIssues = reports.length;
   const resolvedIssues = reports.filter((r) => r.status === "resolved").length;
   const pendingIssues = reports.filter((r) => r.status === "pending").length;
   const rejectedIssues = reports.filter((r) => r.status === "rejected").length;
+
+  // Total Payment হিসাব
+  const citizenPayments = citizens
+    .filter((c) => c.status === "premium")
+    .map(() => 1000);
+
+  const issuePayments = reports
+    .filter((r) => r.priority === "High" && r.boosted)
+    .map(() => 100);
+
+  const totalPayment = [...citizenPayments, ...issuePayments].reduce(
+    (sum, amt) => sum + amt,
+    0
+  );
 
   const chartData = [
     { name: "Resolved", value: resolvedIssues },
@@ -66,6 +83,13 @@ const AdminStatistics = () => {
                 value={totalIssues}
                 gradient="bg-gradient-to-r from-red-600 to-red-400"
               />
+              <StatCard
+                icon={<FaDollarSign className="w-7 h-7 text-white" />}
+                title="Total Payment"
+                value={totalPayment + " tk"}
+                gradient="bg-gradient-to-r from-green-600 to-green-400"
+              />
+
               <StatCard
                 icon={<AiOutlineCheckCircle className="w-7 h-7 text-white" />}
                 title="Resolved Issues"
