@@ -6,7 +6,7 @@ import Banner from "../../components/Home/Banner";
 import FeaturesSection from "../../components/Home/FeaturesSection";
 import HowItWorksSection from "../../components/Home/HowItWorksSection";
 import LatestResolvedIssues from "../../components/Home/LatestResolvedIssues";
-import Plants from "../../components/Home/Plants";
+
 import Button from "../../components/Shared/Button/Button";
 import Container from "../../components/Shared/Container";
 import StatisticsSection from "../../components/Home/StatisticsSection";
@@ -87,7 +87,6 @@ const Home = () => {
           <TestimonialsSection />
         </motion.div>
       </Container>
-      {/* <Plants /> */}
     </div>
   );
 };

@@ -5,7 +5,7 @@ import SignUp from "../pages/SignUp/SignUp";
 
 import PrivateRoute from "./PrivateRoute";
 import DashboardLayout from "../layouts/DashboardLayout";
-// import AddPlant from "../pages/Dashboard/Seller/AddPlant";
+
 import ManageUsers from "../pages/Dashboard/Admin/ManageUser/ManageUsers";
 import Profile from "../pages/Dashboard/Common/Profile";
 import Statistics from "../pages/Dashboard/Common/Statistics";
@@ -86,14 +86,7 @@ export const router = createBrowserRouter([
           </PrivateRoute>
         ),
       },
-      // {
-      //   path: "add-plant",
-      //   element: (
-      //     <PrivateRoute>
-      //       <AddPlant />
-      //     </PrivateRoute>
-      //   ),
-      // },
+     
       // citizen part
       {
         path: "my-issues",
