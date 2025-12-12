@@ -23,10 +23,10 @@ import useAuth from "../../../hooks/useAuth";
 
 const CitizenStatistics = () => {
   const { user } = useAuth();
-  console.log(user.email);
+  // console.log(user.email);
   const axiosSecure = useAxiosSecure();
 
-  // ✅ Fetch reports only for logged-in citizen
+  // Fetch reports only for logged-in citizen
   const { data: reports = [], isLoading } = useQuery({
     queryKey: ["citizenReports", user?.email],
     queryFn: async () => {
@@ -41,19 +41,24 @@ const CitizenStatistics = () => {
     enabled: !!user?.email,
   });
 
-  // ✅ Stats calculation
+  // Stats calculation
   const totalIssues = reports.length;
   const pendingIssues = reports.filter((r) => r.status === "pending").length;
   const inProgressIssues = reports.filter(
     (r) => r.status === "in-progress"
   ).length;
   const resolvedIssues = reports.filter((r) => r.status === "resolved").length;
-  const totalPayments = reports.reduce(
-    (sum, r) => sum + (r.paymentAmount || 0),
-    0
-  );
+  // const totalPayments = reports.reduce(
+  //   (sum, r) => sum + (r.paymentAmount || 0),
+  //   0
+  // );
 
-  // ✅ Chart data
+  // // ✅ High Priority Payments (1000 per High priority report created by this citizen)
+  // const highPriorityPayments = reports
+  //   .filter((r) => r.priority === "High" && r.reporter?.email === user?.email)
+  //   .reduce((sum) => sum + 100, 0);
+
+  // Chart data
   const chartData = [
     { name: "Pending", value: pendingIssues },
     { name: "In Progress", value: inProgressIssues },
@@ -96,12 +101,13 @@ const CitizenStatistics = () => {
                 value={resolvedIssues}
                 gradient="bg-gradient-to-r from-teal-600 to-teal-400"
               />
-              <StatCard
+
+              {/* <StatCard
                 icon={<FaDollarSign className="w-7 h-7 text-white" />}
                 title="Total Payments"
                 value={`$${totalPayments}`}
                 gradient="bg-gradient-to-r from-purple-600 to-purple-400"
-              />
+              /> */}
             </div>
 
             {/* Chart */}
