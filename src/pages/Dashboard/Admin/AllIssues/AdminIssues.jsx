@@ -46,7 +46,6 @@ const AdminIssues = () => {
   // ✅ Assign mutation
   const assignMutation = useMutation({
     mutationFn: async ({ issueId, staff }) => {
-      // staff object will contain both email + name
       const res = await axiosSecure.put(`/reports/${issueId}/assign`, {
         staffEmail: staff.email,
         staffName: staff.name,
@@ -57,7 +56,7 @@ const AdminIssues = () => {
       toast.success("Staff assigned!");
       setSelectedIssue(null);
       setSelectedStaff("");
-      queryClient.invalidateQueries(["all-issues"]); // refresh issues list
+      queryClient.invalidateQueries(["all-issues"]);
     },
   });
 
@@ -106,72 +105,74 @@ const AdminIssues = () => {
 
   return (
     <Container>
-      <div className="p-6">
-        <h1 className="text-2xl font-bold mb-4">All Issues</h1>
+      <div className="p-4 md:p-6">
+        <h1 className="text-xl md:text-2xl font-bold mb-4">All Issues</h1>
 
-        {/* Table */}
-        <table className="w-full text-left">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="p-2">Title</th>
-              <th className="p-2">Category</th>
-              <th className="p-2">Status</th>
-              <th className="p-2">Priority</th>
-              <th className="p-2">Assigned Staff</th>
-              <th className="p-2">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sortedIssues.map((issue) => (
-              <tr
-                key={issue._id}
-                className={issue.boosted ? "bg-yellow-50 font-semibold" : ""}
-              >
-                <td className="p-2">{issue.title}</td>
-                <td className="p-2">{issue.category}</td>
-                <td className="p-2 capitalize">{issue.status}</td>
-                <td className="p-2 capitalize">{issue.priority}</td>
-                <td className="p-2">
-                  {issue.assignedStaff
-                    ? `${issue.assignedStaff.name} (${issue.assignedStaff.email})`
-                    : "Not Assigned"}
-                </td>
-                <td className="p-2 flex gap-2">
-                  {/* Assign Staff button only if status is pending */}
-                  {issue.status?.toLowerCase() === "pending" &&
-                    !issue.assignedStaff && (
+        {/* ✅ Responsive Table Wrapper */}
+        <div className="overflow-x-auto">
+          <table className="w-full text-left min-w-[600px]">
+            <thead>
+              <tr className="bg-gray-100 text-sm md:text-base">
+                <th className="p-2">Title</th>
+                <th className="p-2">Category</th>
+                <th className="p-2">Status</th>
+                <th className="p-2">Priority</th>
+                <th className="p-2">Assigned Staff</th>
+                <th className="p-2">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {sortedIssues.map((issue) => (
+                <tr
+                  key={issue._id}
+                  className={`text-sm md:text-base ${
+                    issue.boosted ? "bg-yellow-50 font-semibold" : ""
+                  }`}
+                >
+                  <td className="p-2">{issue.title}</td>
+                  <td className="p-2">{issue.category}</td>
+                  <td className="p-2 capitalize">{issue.status}</td>
+                  <td className="p-2 capitalize">{issue.priority}</td>
+                  <td className="p-2">
+                    {issue.assignedStaff
+                      ? `${issue.assignedStaff.name} (${issue.assignedStaff.email})`
+                      : "Not Assigned"}
+                  </td>
+                  <td className="p-2 flex flex-col md:flex-row gap-2">
+                    {issue.status?.toLowerCase() === "pending" &&
+                      !issue.assignedStaff && (
+                        <button
+                          onClick={() => setSelectedIssue(issue._id)}
+                          className="bg-blue-500 px-3 py-1 rounded text-white hover:bg-blue-700 text-xs md:text-sm"
+                        >
+                          Assign Staff
+                        </button>
+                      )}
+
+                    {issue.status?.toLowerCase() === "pending" && (
                       <button
-                        onClick={() => setSelectedIssue(issue._id)}
-                        className="bg-blue-500 px-3 py-1 rounded text-white hover:bg-blue-700"
+                        onClick={() => handleRejectIssue(issue._id)}
+                        className="bg-red-500 px-3 py-1 rounded text-white hover:bg-red-700 text-xs md:text-sm"
                       >
-                        Assign Staff
+                        Reject Issue
                       </button>
                     )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
-                  {/* Reject button only if status is pending */}
-                  {issue.status?.toLowerCase() === "pending" && (
-                    <button
-                      onClick={() => handleRejectIssue(issue._id)}
-                      className="bg-red-500 px-3 py-1 rounded text-white hover:bg-red-700"
-                    >
-                      Reject Issue
-                    </button>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {/* Modal for Assign Staff */}
+        {/* ✅ Modal for Assign Staff */}
         {selectedIssue && (
-          <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-            <div className="bg-white p-6 rounded shadow-lg w-96">
+          <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4">
+            <div className="bg-white p-4 md:p-6 rounded shadow-lg w-full max-w-md">
               <h2 className="text-lg font-bold mb-4">Assign Staff</h2>
               <select
                 value={selectedStaff}
                 onChange={(e) => setSelectedStaff(e.target.value)}
-                className="border px-3 py-2 rounded w-full mb-4"
+                className="border px-3 py-2 rounded w-full mb-4 text-sm md:text-base"
               >
                 <option value="">Select Staff</option>
                 {staffList.map((staff) => (
@@ -180,10 +181,10 @@ const AdminIssues = () => {
                   </option>
                 ))}
               </select>
-              <div className="flex justify-end gap-3">
+              <div className="flex flex-col md:flex-row justify-end gap-3">
                 <button
                   onClick={() => setSelectedIssue(null)}
-                  className="bg-gray-400 px-4 py-2 rounded text-white hover:bg-gray-600"
+                  className="bg-gray-400 px-4 py-2 rounded text-white hover:bg-gray-600 text-sm md:text-base"
                 >
                   Cancel
                 </button>
@@ -200,7 +201,7 @@ const AdminIssues = () => {
                     }
                   }}
                   disabled={!selectedStaff}
-                  className="bg-blue-500 px-4 py-2 rounded text-white hover:bg-blue-700 disabled:opacity-50"
+                  className="bg-blue-500 px-4 py-2 rounded text-white hover:bg-blue-700 disabled:opacity-50 text-sm md:text-base"
                 >
                   Confirm
                 </button>

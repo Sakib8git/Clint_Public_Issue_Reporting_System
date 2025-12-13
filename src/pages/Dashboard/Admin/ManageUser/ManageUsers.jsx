@@ -35,12 +35,10 @@ const ManageUsers = () => {
       confirmButtonText: `Yes, ${newAction} it!`,
     }).then((result) => {
       if (result.isConfirmed) {
-        // ✅ Patch request to backend
         axiosSecure
           .patch(`/citizen/action/${userId}`, { action: newAction })
           .then((res) => {
             if (res.data.modifiedCount > 0) {
-              // update local state
               const updated = users.map((user) =>
                 user._id === userId ? { ...user, action: newAction } : user
               );
@@ -65,59 +63,66 @@ const ManageUsers = () => {
   };
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Manage Citizen</h1>
+    <div className="p-4 md:p-6">
+      <h1 className="text-xl md:text-2xl font-bold mb-4">Manage Citizen</h1>
 
-      <table className="w-full  text-left">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="p-2">ID</th>
-            <th className="p-2">Name</th>
-            <th className="p-2">Email</th>
-            <th className="p-2">Role</th>
-            <th className="p-2">Status</th>
-            <th className="p-2">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users
-            .filter((user) => user.role === "citizen") // ✅ only citizens
-            .map((user) => (
-              <tr
-                key={user._id}
-                className={user.status === "blocked" ? "bg-red-50" : ""}
-              >
-                <td className="p-2">{user._id}</td>
-                <td className="p-2">{user.name}</td>
-                <td className="p-2">{user.email}</td>
-                <td className="p-2 capitalize">{user.role}</td>
-                <td className="p-2 capitalize flex items-center gap-2">
-                  {user.status === "premium" ? (
-                    <span className="px-2 py-1 text-xs font-semibold bg-yellow-400 text-white rounded-full">
-                      Premium
-                    </span>
-                  ) : (
-                    user.status || "active"
-                  )}
-                </td>
-                <td className="p-2">
-                  <button
-                    onClick={() =>
-                      handleBlockToggle(user._id, user.action || "unblock")
-                    }
-                    className={`px-3 py-1 rounded text-white ${
-                      user.action === "block"
-                        ? "bg-green-500 hover:bg-green-700"
-                        : "bg-red-500 hover:bg-red-700"
-                    }`}
-                  >
-                    {user.action === "block" ? "Unblock" : "Block"}
-                  </button>
-                </td>
-              </tr>
-            ))}
-        </tbody>
-      </table>
+      {/* ✅ Responsive Table Wrapper */}
+      <div className="overflow-x-auto">
+        <table className="w-full text-left min-w-[600px]">
+          <thead>
+            <tr className="bg-gray-100 text-sm md:text-base">
+              {/* ID column hidden on small screens */}
+              <th className="p-2 hidden sm:table-cell">ID</th>
+              <th className="p-2">Name</th>
+              <th className="p-2">Email</th>
+              <th className="p-2">Role</th>
+              <th className="p-2">Status</th>
+              <th className="p-2">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {users
+              .filter((user) => user.role === "citizen")
+              .map((user) => (
+                <tr
+                  key={user._id}
+                  className={`text-sm md:text-base ${
+                    user.status === "blocked" ? "bg-red-50" : ""
+                  }`}
+                >
+                  {/* ID column hidden on small screens */}
+                  <td className="p-2 hidden sm:table-cell">{user._id}</td>
+                  <td className="p-2">{user.name}</td>
+                  <td className="p-2">{user.email}</td>
+                  <td className="p-2 capitalize">{user.role}</td>
+                  <td className="p-2 capitalize flex items-center gap-2">
+                    {user.status === "premium" ? (
+                      <span className="px-2 py-1 text-xs font-semibold bg-yellow-400 text-white rounded-full">
+                        Premium
+                      </span>
+                    ) : (
+                      user.status || "active"
+                    )}
+                  </td>
+                  <td className="p-2">
+                    <button
+                      onClick={() =>
+                        handleBlockToggle(user._id, user.action || "unblock")
+                      }
+                      className={`px-3 py-1 rounded text-white text-xs md:text-sm ${
+                        user.action === "block"
+                          ? "bg-green-500 hover:bg-green-700"
+                          : "bg-red-500 hover:bg-red-700"
+                      }`}
+                    >
+                      {user.action === "block" ? "Unblock" : "Block"}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

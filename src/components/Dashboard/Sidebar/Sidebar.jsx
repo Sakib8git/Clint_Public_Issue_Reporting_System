@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router";
 import useAuth from "../../../hooks/useAuth";
 import { AiTwotoneHome } from "react-icons/ai";
-// Icons
 import { GrLogout } from "react-icons/gr";
 import { FcSettings } from "react-icons/fc";
 import { BsGraphUp } from "react-icons/bs";
@@ -14,6 +13,7 @@ import AdminMenu from "./Menu/AdminMenu";
 import useRole from "../../../hooks/useRoll";
 import StaffMenu from "./Menu/StaffMenu";
 import CitizenMenu from "./Menu/CitizenMenu";
+
 const Sidebar = () => {
   const { logOut } = useAuth();
   const location = useLocation();
@@ -60,9 +60,9 @@ const Sidebar = () => {
 
       {/* Sidebar */}
       <div
-        className={`z-50 md:fixed h-screen w-16 bg-gradient-to-b from-green-500 to-blue-600 text-white flex flex-col justify-between items-center py-6 shadow-xl ${
-          isActive ? "-translate-x-full" : "translate-x-0"
-        } md:translate-x-0 transition duration-300 ease-in-out`}
+        className={`z-50 fixed top-0 left-0 h-screen w-64 md:w-16 bg-gradient-to-b from-green-500 to-blue-600 text-white flex flex-col justify-between items-center py-6 shadow-xl
+        ${isActive ? "translate-x-0" : "-translate-x-full"} 
+        md:translate-x-0 transition-transform duration-300 ease-in-out`}
       >
         {/* Logo */}
         <Link
@@ -83,14 +83,14 @@ const Sidebar = () => {
           >
             <BsGraphUp className="w-5 h-5" />
           </Link>
-          {/* note:cityzen */}
+
+          {/* note:citizen */}
           {role === "citizen" && <CitizenMenu />}
-          
+
           {/* note:staff */}
-          {/* profile- staff------ */}
           {role === "staff" && <StaffMenu />}
 
-          {/* note:Admin */}
+          {/* note:admin */}
           {role === "admin" && <AdminMenu />}
         </div>
 

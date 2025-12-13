@@ -48,7 +48,11 @@ export const router = createBrowserRouter([
       },
       {
         path: "feedback",
-        element: <Feedback />,
+        element: (
+          <PrivateRoute>
+            <Feedback />
+          </PrivateRoute>
+        ),
       },
       {
         path: "boost-pay-success",
@@ -86,7 +90,7 @@ export const router = createBrowserRouter([
           </PrivateRoute>
         ),
       },
-     
+
       // citizen part
       {
         path: "my-issues",

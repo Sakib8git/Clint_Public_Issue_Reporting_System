@@ -47,9 +47,9 @@ Pending → In-Progress → Resolved → Closed
 # Clone the repository
 
 🖥️ forntend
-git clone
+git clone https://github.com/Sakib8git/Clint_Public_Issue_Reporting_System.git
 🧷 backend
-git clone
+git clone https://github.com/Sakib8git/Server_Public_Issue_Reporting_System.git
 
 # Navigate to project folder
 

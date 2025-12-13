@@ -35,14 +35,13 @@ const Navbar = () => {
               >
                 All Reports
               </Link>
-              {/* About link - hidden on small screens */}
+              {/* ✅ About & Feedback visible only on md+ */}
               <Link
                 to="/about"
                 className="hidden md:block text-sm font-semibold hover:text-blue-500 transition"
               >
                 About
               </Link>
-              {/* About link - hidden on small screens */}
               <Link
                 to="/feedback"
                 className="hidden md:block text-sm font-semibold hover:text-blue-500 transition"
@@ -75,8 +74,22 @@ const Navbar = () => {
               </div>
 
               {isOpen && (
-                <div className="absolute rounded-xl shadow-md w-[40vw] md:w-[10vw] bg-white overflow-hidden right-0 top-12 text-sm">
+                <div className="absolute rounded-xl shadow-md w-[60vw] md:w-[10vw] bg-white overflow-hidden right-0 top-12 text-sm">
                   <div className="flex flex-col cursor-pointer">
+                    {/* ✅ About & Feedback visible only on sm */}
+                    <Link
+                      to="/about"
+                      className="block md:hidden px-4 py-3 hover:bg-neutral-100 transition font-semibold"
+                    >
+                      About
+                    </Link>
+                    <Link
+                      to="/feedback"
+                      className="block md:hidden px-4 py-3 hover:bg-neutral-100 transition font-semibold"
+                    >
+                      Feedback
+                    </Link>
+
                     {user ? (
                       <>
                         <div className="px-4 py-3 hover:bg-neutral-100 transition font-semibold cursor-pointer">
