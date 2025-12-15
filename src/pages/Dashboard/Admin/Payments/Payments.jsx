@@ -51,7 +51,7 @@ const Payments = () => {
     .map((c, index) => ({
       id: `CIT${String(index + 1).padStart(3, "0")}`,
       user: c.name,
-      amount: 1000, // citizen amount
+      amount: 1000,
       method: "Stripe",
       status: "success",
       date: c.paymentDate
@@ -65,7 +65,7 @@ const Payments = () => {
     .map((r, index) => ({
       id: `ISS${String(index + 1).padStart(3, "0")}`,
       user: r.title || "Unknown",
-      amount: 100, // issue amount
+      amount: 100,
       method: "Stripe",
       status: "success",
       date: r.lastUpdated
@@ -86,7 +86,7 @@ const Payments = () => {
   const totalAmount = filteredPayments.reduce((sum, p) => sum + p.amount, 0);
 
   return (
-    <div className="p-6 ">
+    <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Payments</h1>
 
       {/* ✅ Total Amount */}
@@ -95,7 +95,7 @@ const Payments = () => {
       </div>
 
       {/* Filters */}
-      <div className="flex gap-4  mb-6">
+      <div className="flex flex-col sm:flex-row gap-4 mb-6">
         <select
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
@@ -125,45 +125,54 @@ const Payments = () => {
         />
       </div>
 
-      {/* Table */}
+      {/* ✅ Responsive Table */}
       <Container>
-        <table className="w-full bg-amber-50  rounded-2xl text-left">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="p-2">Payment ID</th>
-              <th className="p-2">User</th>
-              <th className="p-2">Amount</th>
-              <th className="p-2">Method</th>
-              <th className="p-2">Status</th>
-              <th className="p-2">Date</th>
-              <th className="p-2">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredPayments.map((payment) => (
-              <tr key={payment.id}>
-                <td className="p-2">{payment.id}</td>
-                <td className="p-2">{payment.user}</td>
-                <td className="p-2">{payment.amount} tk</td>
-                <td className="p-2">{payment.method}</td>
-                <td className="p-2 text-green-600 capitalize">
-                  {payment.status}
-                </td>
-                <td className="p-2">{payment.date}</td>
-                <td className="p-2">
-                  <button
-                    className="px-3 py-1 bg-gradient-to-r from-blue-500 to-indigo-600 
-                               text-white font-semibold rounded-lg shadow-md 
-                               transition-transform transform hover:scale-105 
-                               hover:from-indigo-600 hover:to-blue-500"
-                  >
-                    Download
-                  </button>
-                </td>
+        <div className="overflow-x-auto">
+          <table className="min-w-full bg-amber-50 rounded-2xl text-left 
+                            text-xs sm:text-sm md:text-base lg:text-lg">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="p-2 md:p-3">Payment ID</th>
+                <th className="p-2 md:p-3">User</th>
+                <th className="p-2 md:p-3">Amount</th>
+                <th className="p-2 md:p-3">Method</th>
+                <th className="p-2 md:p-3">Status</th>
+                <th className="p-2 md:p-3">Date</th>
+                <th className="p-2 md:p-3">Action</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filteredPayments.map((payment) => (
+                <tr key={payment.id} className="border-b">
+                  <td className="p-2 md:p-3 whitespace-nowrap">{payment.id}</td>
+                  <td className="p-2 md:p-3 whitespace-nowrap">{payment.user}</td>
+                  <td className="p-2 md:p-3 whitespace-nowrap">
+                    {payment.amount} tk
+                  </td>
+                  <td className="p-2 md:p-3 whitespace-nowrap">
+                    {payment.method}
+                  </td>
+                  <td className="p-2 md:p-3 text-green-600 capitalize whitespace-nowrap">
+                    {payment.status}
+                  </td>
+                  <td className="p-2 md:p-3 whitespace-nowrap">{payment.date}</td>
+                  <td className="p-2 md:p-3">
+                    <button
+                      className="px-2 py-1 md:px-3 md:py-2 
+                                 bg-gradient-to-r from-blue-500 to-indigo-600 
+                                 text-white font-semibold rounded-lg shadow-md 
+                                 transition-transform transform hover:scale-105 
+                                 hover:from-indigo-600 hover:to-blue-500 
+                                 text-xs sm:text-sm md:text-base"
+                    >
+                      Download
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </Container>
     </div>
   );

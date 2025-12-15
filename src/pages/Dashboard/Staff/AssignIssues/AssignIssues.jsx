@@ -22,7 +22,7 @@ const AssignedIssues = () => {
     data: issues = [],
     isLoading,
     isError,
-    refetch, // ✅ add refetch
+    refetch,
   } = useQuery({
     queryKey: ["assigned-issues", user?.email],
     enabled: !!user?.email,
@@ -30,7 +30,6 @@ const AssignedIssues = () => {
       const res = await axiosSecure.get(
         `${import.meta.env.VITE_API_URL}/reports/assigned/${user.email}`
       );
-      // console.log(res.data);
       return res.data;
     },
   });
@@ -45,7 +44,6 @@ const AssignedIssues = () => {
     },
     onSuccess: (_, variables) => {
       toast.success("Status updated!");
-      // ✅ If resolved, refetch to remove from UI
       if (variables.newStatus === "resolved") {
         refetch();
       } else {
@@ -64,51 +62,58 @@ const AssignedIssues = () => {
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">My Assigned Issues</h1>
 
-      <table className="w-full text-left">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="p-2">ID</th>
-            <th className="p-2">Title</th>
-            <th className="p-2">Status</th>
-            <th className="p-2">Priority</th>
-            <th className="p-2">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {issues.map((issue) => (
-            <tr
-              key={issue._id}
-              className={issue.boosted ? "bg-yellow-50 font-semibold" : ""}
-            >
-              <td className="p-2">{issue._id}</td>
-              <td className="p-2">{issue.title}</td>
-              <td className="p-2 capitalize">{issue.status}</td>
-              <td className="p-2 capitalize">{issue.priority}</td>
-              <td className="p-2">
-                <select
-                  value={issue.status}
-                  onChange={(e) =>
-                    statusMutation.mutate({
-                      id: issue._id,
-                      newStatus: e.target.value,
-                    })
-                  }
-                  className="border px-2 py-1 rounded"
-                >
-                  <option value={issue.status}>{issue.status}</option>
-                  {statusOptions
-                    .filter((s) => statusFlow[issue.status] === s)
-                    .map((s) => (
-                      <option key={s} value={s}>
-                        {s}
-                      </option>
-                    ))}
-                </select>
-              </td>
+      {/* ✅ Responsive Table Wrapper */}
+      <div className="overflow-x-auto">
+        <table className="min-w-full text-left text-sm sm:text-base">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="p-2">ID</th>
+              <th className="p-2">Title</th>
+              <th className="p-2">Status</th>
+              <th className="p-2">Priority</th>
+              <th className="p-2">Action</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {issues.map((issue) => (
+              <tr
+                key={issue._id}
+                className={issue.boosted ? "bg-yellow-50 font-semibold" : ""}
+              >
+                <td className="p-2 whitespace-nowrap">{issue._id}</td>
+                <td className="p-2 whitespace-nowrap">{issue.title}</td>
+                <td className="p-2 capitalize whitespace-nowrap">
+                  {issue.status}
+                </td>
+                <td className="p-2 capitalize whitespace-nowrap">
+                  {issue.priority}
+                </td>
+                <td className="p-2">
+                  <select
+                    value={issue.status}
+                    onChange={(e) =>
+                      statusMutation.mutate({
+                        id: issue._id,
+                        newStatus: e.target.value,
+                      })
+                    }
+                    className="border px-2 py-1 rounded text-xs sm:text-sm"
+                  >
+                    <option value={issue.status}>{issue.status}</option>
+                    {statusOptions
+                      .filter((s) => statusFlow[issue.status] === s)
+                      .map((s) => (
+                        <option key={s} value={s}>
+                          {s}
+                        </option>
+                      ))}
+                  </select>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

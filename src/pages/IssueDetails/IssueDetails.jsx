@@ -412,7 +412,7 @@ const IssueDetails = () => {
               <div className="absolute w-3 h-3 bg-purple-500 rounded-full -left-1.5 border border-white"></div>
               <h3 className="text-lg font-semibold">Issue Closed</h3>
               <p className="text-sm text-gray-600">
-                <span className="font-semibold">Closed By:</span>{" "}
+                <span className="font-semibold">Closed By:Admin </span>{" "}
                 {issue.staffInfo}
               </p>
               <p className="text-sm text-gray-600">
