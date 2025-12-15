@@ -371,38 +371,40 @@ const IssueDetails = () => {
           )}
 
           {/* Step 2: Assigned Staff */}
-          {issue?.assignedStaff && issue?.staffInfo && (
+          {issue?.assignedStaff ? (
             <div className="mb-10 ml-6 relative">
-              <div className="absolute w-3 h-3 bg-blue-500 rounded-full -left-1.5 border border-white"></div>
+              <div className="absolute w-3 h-3 bg-blue-500 rounded-full -left-7.5 border border-white"></div>
               <h3 className="text-lg font-semibold">Assigned Staff</h3>
 
               <p className="text-sm text-gray-600">
                 <span className="font-semibold">Name:</span>{" "}
-                {issue.staffInfo.name}
+                {issue.assignedStaff?.name || "N/A"}
               </p>
               <p className="text-sm text-gray-600">
                 <span className="font-semibold">Role:</span>{" "}
-                {issue.staffInfo.role}
+                {issue.staffInfo?.role || "Staff"}
               </p>
+
               <p className="text-sm text-gray-600">
-                <span className="font-semibold">Contact:</span>{" "}
-                {issue.staffInfo.email}
+                <span className="font-semibold">Issue Status:</span>{" "}
+                {issue.status || "N/A"}
               </p>
-              {/* <p className="text-sm text-gray-600">
-                <span className="font-semibold">Assigned On:</span>{" "}
-                {new Date(issue.statusUpdatedAt).toLocaleString()}
-              </p> */}
-              <p className="text-sm text-gray-600">
-                <span className="font-semibold">Status:</span> {issue.status}
-              </p>
+
+              {/* Optional: show assigned date */}
+              {issue.statusUpdatedAt && (
+                <p className="text-sm text-gray-600">
+                  <span className="font-semibold">Assigned On:</span>{" "}
+                  {new Date(issue.statusUpdatedAt).toLocaleString()}
+                </p>
+              )}
               <p className="text-xs text-gray-500 mt-1">
-                Assigned by{" "}
+                Assigned by:{" "}
                 <span className="font-semibold text-blue-600">
                   {issue.assignedBy || "Admin Panel"}
                 </span>
               </p>
             </div>
-          )}
+          ) : null}
           {/* ---------------------- */}
 
           {/* ---------------------- */}
@@ -412,12 +414,17 @@ const IssueDetails = () => {
               <div className="absolute w-3 h-3 bg-purple-500 rounded-full -left-1.5 border border-white"></div>
               <h3 className="text-lg font-semibold">Issue Closed</h3>
               <p className="text-sm text-gray-600">
-                <span className="font-semibold">Closed By:Admin </span>{" "}
-                {issue.staffInfo}
+                <span className="font-semibold">Resolved By:</span>{" "}
+                {issue.assignedStaff?.name || "N/A"}
               </p>
               <p className="text-sm text-gray-600">
                 <span className="font-semibold">Status:</span> {issue.status}
               </p>
+              <p className="text-sm text-gray-600">
+                <span className="font-semibold ">Closed By:<span className="text-blue-600">Admin Panel</span> </span>{" "}
+                {issue.staffInfo}
+              </p>
+              
               {issue.resolvedAt && (
                 <p className="text-sm text-gray-600">
                   <span className="font-semibold">Resolved On:</span>{" "}

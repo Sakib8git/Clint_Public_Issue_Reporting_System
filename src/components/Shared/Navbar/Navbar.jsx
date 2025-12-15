@@ -16,7 +16,11 @@ const Navbar = () => {
           <div className="flex flex-row items-center justify-between gap-3 md:gap-0">
             {/* Logo */}
             <Link to="/">
-              <h2 className="text-4xl font-extrabold bg-gradient-to-r from-green-500 to-blue-600 bg-clip-text text-transparent">
+              <h2
+                className="text-2xl sm:text-4xl font-extrabold 
+               bg-gradient-to-r from-green-500 to-blue-600 
+               bg-clip-text text-transparent"
+              >
                 ReportHub
               </h2>
             </Link>
